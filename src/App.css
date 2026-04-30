@@ -1,0 +1,155 @@
+/* App.css atualizado para Bootstrap */
+
+/* 1. Estilo para o fundo da página (opcional) */
+body {
+  background-color: #f8f9fa; /* Um cinza bem clarinho estilo Apple/iFood */
+}
+
+/* nav */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #d63384;
+  color: white;
+  padding: 8px;
+  z-index: 2000;
+  transition: top 0.3s;
+}
+
+.skip-link:focus {
+  top: 0; /* Aparece apenas quando o usuário aperta TAB */
+}
+/* Customizando o indicador de foco para acessibilidade */
+.nav-link:focus-visible, 
+.btn:focus-visible, 
+.card:focus-visible {
+  outline: 3px solid #d63384; /* Rosa do seu projeto */
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+/* Remove o contorno azul padrão e adiciona o personalizado em todos os links e botões */
+a:focus-visible, 
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid #d63384 !important; /* O rosa do seu botão */
+  outline-offset: 3px; /* Cria um espacinho entre o elemento e a linha */
+  border-radius: 8px; /* Deixa os cantos da linha de foco arredondados */
+}
+
+/* Opcional: remover o contorno antigo para navegadores que não suportam focus-visible */
+a:focus, button:focus {
+  outline: none;
+}
+
+/* 2. Efeito de interação nos Cards */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+  cursor: pointer;
+  padding: 15px;
+  margin-top: 15px 0;
+  border-radius: 10px;
+}
+
+.card:hover {
+  transform: translateY(-8px); /* Card sobe um pouco ao passar o mouse */
+  box-shadow: 0 12px 24px rgba(0,0,0,0.15) !important;
+}
+
+/* 3. Ajuste para o texto dentro da área da imagem */
+.card div[style*="background-color"] span {
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 0.85rem;
+}
+
+/* 4. Ajuste para o link (tirar o sublinhado azul) */
+a.card {
+  text-decoration: none !important;
+}
+a.card:focus {
+  outline: 3px solid #d63384;
+  outline-offset: 4px;
+  transform: translate(-5px);
+}
+
+/* Efeito de foco suave na barra de busca */
+.form-control:focus {
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+  border-color: transparent;
+}
+
+/* Deixar o header com uma animação de entrada */
+header {
+  animation: fadeInDown 0.8s ease-out;
+  
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Esconde a barra de rolagem horizontal mas mantém o scroll funcional */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+/* Isso impede que o Flexbox esconda os itens iniciais */
+.no-scrollbar {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  padding: 5px 20px !important; /* Respiro lateral para não colar na borda */
+  gap: 10px; /* Espaço entre os botões */
+  scrollbar-width: none; /* Esconde scroll no Firefox */
+}
+
+/* Garante que o container de categorias não "esmague" os botões */
+.flex-shrink-0 {
+  flex-shrink: 0 !important;
+  min-width: fit-content !important;
+}
+
+/* Deixa os botões de categoria mais suaves */
+.btn-outline-secondary {
+  border-color: #eee;
+  color: #666;
+  font-size: 0.85rem;
+}
+.dropdown {
+  background-color: #f0c5d1;
+  border-radius: 15px;
+  padding: 10px;
+  border: none;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  border: 1px solid #d63384;
+}
+.dropdown-item:hover {
+  background-color: #f8f9fa !important;
+  color: #d63384 !important;
+  text-decoration: underline;
+}
+.dropdown-item:focus {
+  background-color: #ddd0f6 !important;
+  outline: 2px solid #d63384;
+  
+}
+
+
+/* 2. Centraliza APENAS em telas grandes (PC) */
+@media (min-width: 992px) {
+  .no-scrollbar {
+    justify-content: center !important; /* Centraliza se couber */
+    overflow-x: hidden !important;   /* Evita scroll desnecessário no PC */
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}

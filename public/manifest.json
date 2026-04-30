@@ -1,0 +1,23 @@
+{
+  "short_name": "HubServiços",
+  "name": "Hub Serviços - Itupeva",
+  "description": "Guia de Serviços e Comércio Local",
+  "icons": [
+    {
+      "src": "/logoseusite.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/logoseusite.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#d63384",
+  "background_color": "#ffffff"
+}
