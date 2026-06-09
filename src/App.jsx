@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
@@ -10,34 +11,45 @@ function App() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Tudo');
   const [regiaoSelecionada, setRegiaoSelecionada] = useState('Itupeva, SP');
 
+  // Lista de lojas atualizada com novos clientes, endereços e níveis de plano
   const lojas = [
     { 
-      nome: 'Marmitaria da Déia', 
-      link: 'https://marmitaria-two.vercel.app/', 
-      categoria: 'Comida',
+      nome: 'Marciano Coiffeur', 
+      link: '', 
+      categoria: 'Beleza',
       regiao: 'Itupeva, SP', 
-      imagem: '/marmitaria-deia.png' 
+      endereco: 'Rua Alfredo Carlos São José, 109 - Jd Europa - CEP: 13296-124',
+      imagem: '/marciano.png',
+      plano: 'free',
+      whatsapp: 'https://wa.me/qr/YFF6REAHSJ2OD1',
+      instagram: 'https://www.instagram.com/marcianocoiffeur?utm_source=qr&igsh=Z3F4c2FwdXA1YTBk'
     },
     { 
       nome: 'Camomila Sabonetes Artesanais', 
-      link: 'https://seusitesuacara.com/camomila/?ref=JUELISIA2026', 
+      link: 'https://catalogo-camomila.vercel.app/?ref=JUELISIA2026', 
       categoria: 'Artesanato',
       regiao: 'Itupeva, SP',
-      imagem: '/camomila.png'
+      endereco: 'Vendas Online / Encomendas',
+      imagem: '/camomila.png',
+      plano: 'premium'
     },
     { 
       nome: 'Seu site, suacara- Soluções digitais', 
       link: 'https://www.seusitesuacara.com',    
       categoria: 'Soluções Digitais',
       regiao: 'Itupeva, SP',
-      imagem: '/logoseusite.png'
+      endereco: 'Atendimento Online / Home Office',
+      imagem: '/logoseusite.png',
+      plano: 'premium'
     },
     { 
       nome: 'Mk Fitness Academia', 
       link: 'https://www.mkfitnessacademia.com.br',    
       categoria: 'Academia',
       regiao: 'Itupeva, SP',
-      imagem: '/academia.png'
+      endereco: 'Av. Itália, 581 - Centro',
+      imagem: '/academia.png',
+      plano: 'premium'
     }
   ];
 
@@ -159,68 +171,169 @@ function App() {
         </div>
       </header>
 
-      {/* Banner de Cadastro: Delicado, mas visível */}
-<div className="container px-3 mb-4">
-  <div className="rounded-4 p-4 text-center border-0 shadow-sm" 
-       style={{ backgroundColor: '#fff0f6', border: '1px dashed #d63384' }}>
-    <h4 className="fw-bold text-dark mb-2">Sua empresa ainda não está aqui?</h4>
-    <p className="text-muted mb-3">Aumente sua visibilidade em Itupeva. Cadastre-se agora!</p>
-    <a href="/seu-link-de-cadastro" 
-       className="btn px-4 py-2 rounded-pill fw-bold" 
-       style={{ backgroundColor: '#d63384', color: '#fff' }}>
-       Quero anunciar minha empresa
-    </a>
-  </div>
-</div>
+      {/* Banner de Cadastro Atualizado para o Fluxo Freemium com sua validação posterior */}
+      <div className="container px-3 mb-4">
+        <div className="rounded-4 p-4 text-center border-0 shadow-sm" 
+             style={{ backgroundColor: '#fff0f6', border: '1px dashed #d63384' }}>
+          <h4 className="fw-bold text-dark mb-2">Sua empresa ainda não está no Guia?</h4>
+          <p className="text-muted mb-3">Escolha entre nosso <strong>Plano Gratuito</strong> ou potencialize sua marca com o <strong>Plano Premium</strong>!</p>
+          <a href="/cadastro-plano" 
+             className="btn px-4 py-2 rounded-pill fw-bold" 
+             style={{ backgroundColor: '#d63384', color: '#fff' }}>
+              Quero Anunciar Grátis ou Premium
+          </a>
+          <small className="d-block text-muted mt-2" style={{ fontSize: '0.8rem' }}>
+            *Os cadastros passam por análise de conteúdo e são liberados em até 24 horas pela administração.
+          </small>
+        </div>
+      </div>
 
-
-      {/* GRID AJUSTADA: row-cols-lg-3 para cards maiores no desktop */}
+      {/* GRID DE CARDS */}
+      {/* GRID DE CARDS PADRONIZADO COM BOOTSTRAP ICONS */}
       <main className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 px-3 mx-auto" style={{ maxWidth: '1300px' }}>
-        {lojasFiltradas.map((loja) => (
-          <article key={loja.nome} className="col">
-            <a 
-              href={loja.link} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="card h-100 shadow-sm border-0 text-decoration-none overflow-hidden" 
-              style={{ borderRadius: '18px', transition: '0.3s', display: 'block' }}
-              aria-label={`Visitar catálogo de ${loja.nome} - Categoria ${loja.categoria}`}
-            >
-              {/* Container da Imagem aumentado para 180px */}
-              <div style={{ height: '180px', overflow: 'hidden', backgroundColor: '#f3d5f5' }}>
-                {loja.imagem ? (
-                  <img 
-                    src={loja.imagem} 
-                    alt={`Logotipo da loja ${loja.nome}`} 
-                    className="w-100 h-100" 
-                    style={{ objectFit: 'contain', padding: '15px', transition: '0.5s' }}
-                    loading="lazy"
-                    onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                    onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                  />
-                ) : (
-                  <div className="d-flex align-items-center justify-content-center h-100" aria-hidden="true">
-                    <span className="fw-bold text-secondary opacity-75">{loja.categoria}</span>
+        {lojasFiltradas.map((loja) => {
+          // VARIÁVEIS DE CONTROLE DE PLANO (Definidas certinho para o código abaixo ler)
+          const isPremium = loja.plano === 'premium';
+          const temCatalogo = isPremium && loja.link;
+
+          return (
+            <article key={loja.nome} className="col">
+              <div 
+                className="card h-100 shadow-sm border-0 overflow-hidden position-relative" 
+                style={{ borderRadius: '18px', transition: '0.3s', backgroundColor: '#fff' }}
+              >
+                {/* Faixa Premium */}
+                {isPremium && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '15px',
+                    right: '15px',
+                    backgroundColor: '#ffc107',
+                    color: '#000',
+                    fontWeight: 'bold',
+                    fontSize: '0.75rem',
+                    padding: '4px 12px',
+                    borderRadius: '50px',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                    zIndex: '2'
+                  }}>
+                    ⭐ PREMIUM
                   </div>
                 )}
-              </div>
 
-              {/* Corpo do Card com padding maior (p-4) */}
-              <div className="card-body p-4">
-                <h3 className="h5 fw-bold text-dark mb-2">
-                  {loja.nome}
-                </h3>
-                <p className="text-muted small mb-3">
-                  {loja.categoria} • {loja.regiao}
-                </p>
-                <p className="card-text text-primary fw-bold mb-0">
-                  Ver Catálogo <span aria-hidden="true">➔</span>
-                </p>
+                {/* IMAGEM FIXA (NÃO CLICÁVEL) */}
+                <div style={{ overflow: 'hidden', backgroundColor: '#f3d5f5', height: '180px' }}>
+                  {loja.imagem ? (
+                    <img 
+                      src={loja.imagem} 
+                      alt={`Logotipo de ${loja.nome}`} 
+                      className="w-100 h-100" 
+                      style={{ objectFit: 'contain', padding: '15px' }}
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="d-flex align-items-center justify-content-center h-100">
+                      <span className="fw-bold text-secondary opacity-75">{loja.categoria}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* CORPO DO CARD */}
+                <div className="card-body p-4 d-flex flex-column justify-content-between">
+                  <div>
+                    {/* TÍTULO CONDICIONAL */}
+                    {temCatalogo ? (
+                      <a href={loja.link} target="_blank" rel="noopener noreferrer" className="text-decoration-none text-dark">
+                        <h3 className="h5 fw-bold mb-1" style={{ cursor: 'pointer' }} onMouseOver={(e) => e.currentTarget.style.color = '#0d6efd'} onMouseOut={(e) => e.currentTarget.style.color = '#212529'}>
+                          {loja.nome}
+                        </h3>
+                      </a>
+                    ) : (
+                      <h3 className="h5 fw-bold text-dark mb-1">
+                        {loja.nome}
+                      </h3>
+                    )}
+                    
+                    <p className="text-muted small mb-2">
+                      {loja.categoria} • {loja.regiao}
+                    </p>
+                    <p className="text-secondary small mb-3" style={{ fontSize: '0.85rem' }}>
+                      📍 <em>{loja.endereco}</em>
+                    </p>
+                  </div>
+
+                  {/* AÇÕES: REDES SOCIAIS E BOTÃO DE CATÁLOGO */}
+                  <div className="d-flex align-items-center justify-content-between mt-3 pt-2 border-top" style={{ minHeight: '45px' }}>
+                    
+                    {/* Se for PREMIUM: Mostra apenas o botão de ver o Catálogo/Site */}
+                    {isPremium ? (
+                      <>
+                        <span className="text-primary small fw-bold">Conteúdo Exclusivo</span>
+                        <a 
+                          href={loja.link} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="btn btn-sm btn-primary rounded-pill px-4 fw-bold"
+                          style={{ fontSize: '0.85rem' }}
+                        >
+                          Ver Catálogo ➔
+                        </a>
+                      </>
+                    ) : (
+                      /* Se for FREE: Mostra as redes dinâmicas do cliente */
+                      <>
+                        <div className="d-flex gap-2">
+                          {/* Botão WhatsApp Dinâmico */}
+                          {loja.whatsapp && (
+                            <a
+                              href={loja.whatsapp} 
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="d-flex align-items-center justify-content-center text-decoration-none text-white shadow-sm"
+                              style={{ width: '36px', height: '36px', backgroundColor: '#25D366', borderRadius: '50%', fontSize: '1.1rem', transition: '0.2s' }}
+                              onMouseOver={(e) => {
+                                e.currentTarget.style.transform = 'scale(1.1)';
+                                e.currentTarget.style.backgroundColor = '#1ea851';
+                              }}
+                              onMouseOut={(e) => {
+                                e.currentTarget.style.transform = 'scale(1)';
+                                e.currentTarget.style.backgroundColor = '#25D366';
+                              }}
+                              title="Chamar no WhatsApp"
+                            >
+                              <i className="bi bi-whatsapp"></i>
+                            </a>
+                          )}
+
+                          {/* Botão Instagram Dinâmico */}
+                          {loja.instagram && (
+                            <a
+                              href={loja.instagram} 
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="d-flex align-items-center justify-content-center text-decoration-none text-white shadow-sm"
+                              style={{ width: '36px', height: '36px', background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', borderRadius: '50%', fontSize: '1.1rem', transition: '0.2s' }}
+                              onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
+                              onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                              title="Visitar Instagram"
+                            >
+                              <i className="bi bi-instagram"></i>
+                            </a>
+                          )}
+                        </div>
+                        <span className="text-muted small">Contato Direto</span>
+                      </>
+                    )}
+
+                  </div>
+
+                </div>
               </div>
-            </a>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </main>
+      
       
       {lojasFiltradas.length === 0 && (
         <div className="text-center py-5">
