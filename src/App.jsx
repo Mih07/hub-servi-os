@@ -16,13 +16,24 @@ function App() {
     { 
       nome: 'Marciano Coiffeur', 
       link: '', 
-      categoria: 'Beleza',
+      categoria: 'Salão de Beleza',
       regiao: 'Itupeva, SP', 
-      endereco: 'Rua Alfredo Carlos São José, 109 - Jd Europa - CEP: 13296-124',
+      endereco: 'Rua Alfredo Carlos São José, 109 - Jd Europa - Itupeva/SP',
       imagem: '/marciano.png',
       plano: 'free',
       whatsapp: 'https://wa.me/qr/YFF6REAHSJ2OD1',
       instagram: 'https://www.instagram.com/marcianocoiffeur?utm_source=qr&igsh=Z3F4c2FwdXA1YTBk'
+    },
+    { 
+      nome: 'Faby Brando Hair', 
+      link: '', 
+      categoria: 'Salão de Beleza',
+      regiao: 'Itupeva, SP', 
+      endereco: 'Rua Prefeito José Carlos, 514 - Ana Luiza',
+      imagem: '/fabihair.png',
+      plano: 'free',
+      whatsapp: 'https://wa.me/qr/57KQ6S4MRHCXA1',
+      instagram: 'https://www.instagram.com/fabybrandohair?utm_source=qr&igsh=MTBiNjgyazdtamZqaw=='
     },
     { 
       nome: 'Camomila Sabonetes Artesanais', 
@@ -144,7 +155,7 @@ function App() {
                   </button>
 
                   <ul className="dropdown-menu shadow-lg border-0 w-100 mt-2" aria-labelledby="dropdownMenuButton" style={{ borderRadius: '12px', padding: '10px' }}>
-                    {['Tudo', 'Comida', 'Academia', 'Artesanato', 'Doces', 'Soluções Digitais', 'Beleza', 'Pet', 'Saúde'].map((cat) => (
+                    {['Tudo', 'Academia', 'Artesanato', 'Comida', 'Doces', 'Esmalteria', 'Pet', 'Salão de Beleza',  'Saúde', 'Soluções Digitais'].map((cat) => (
                       <li key={cat}>
                         <button 
                           className="dropdown-item py-3 px-3" 
