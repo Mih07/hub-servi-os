@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import { supabase } from '../supabaseClient';
 
 function Cadastro({ setTelaAtual }) {
   const [formData, setFormData] = useState({
     nome: '',
-    categoria: 'Salão de Beleza',
+    categoria: '',
     regiao: '', 
     endereco: '',
-    descricao: '', // Exclusivo Premium agora
+    descricao: '', // Agora é geral para todo mundo!
     plano: 'free',
     link: '',
     whatsapp: '',
@@ -28,17 +29,38 @@ function Cadastro({ setTelaAtual }) {
     if (file) setFile(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const dadosCompletos = {
-      ...formData,
-      logo: logoFile ? logoFile.name : null,
-      foto1: fotoExtra1 ? fotoExtra1.name : null,
-      foto2: fotoExtra2 ? fotoExtra2.name : null
-    };
-    console.log("Enviando Premium/Free:", dadosCompletos);
-    alert(`Sucesso! O cadastro de "${formData.nome}" foi enviado para análise.`);
-    setTelaAtual('home');
+
+    try {
+      // Mandando os dados direto para a tabela do Supabase
+      const { data, error } = await supabase
+        .from('servicos')
+        .insert([
+          {
+            nome: formData.nome,
+            categoria: formData.categoria,
+            regiao: formData.regiao,
+            endereco: formData.endereco,
+            plano: formData.plano,
+            descricao: formData.descricao, // Salva sempre a descrição geral
+            link: formData.plano === 'premium' ? formData.link : null,
+            whatsapp: formData.plano === 'free' ? formData.whatsapp : null,
+            instagram: formData.plano === 'free' ? formData.instagram : null,
+            imagem: logoFile ? `/${logoFile.name}` : '/placeholder.png',
+            imagem2: fotoExtra1 ? `/${fotoExtra1.name}` : null,
+            imagem3: fotoExtra2 ? `/${fotoExtra2.name}` : null,
+          },
+        ]);
+
+      if (error) throw error;
+
+      alert(`Sucesso! O cadastro de "${formData.nome}" foi salvo e enviado para análise.`);
+      setTelaAtual('home'); // Joga o usuário direto de volta para a Home após o sucesso
+    } catch (error) {
+      console.error('Erro ao cadastrar no Supabase:', error.message);
+      alert('Ops, ocorreu um erro ao salvar os dados. Tente novamente.');
+    }
   };
 
   return (
@@ -65,23 +87,56 @@ function Cadastro({ setTelaAtual }) {
               <input type="text" name="nome" className="form-control form-control-lg rounded-4 shadow-sm" placeholder="Ex: Nome da sua empresa" required value={formData.nome} onChange={handleChange} />
             </div>
 
+            {/* 🛠️ CATEGORIA MUDADA PARA SELECT SEGURO */}
             <div className="col-md-6">
               <label className="form-label fw-bold small text-uppercase text-secondary">Categoria</label>
-              <select name="categoria" className="form-select form-select-lg rounded-4 shadow-sm" value={formData.categoria} onChange={handleChange}>
+              <select 
+                name="categoria" 
+                className="form-select form-control-lg rounded-4 shadow-sm" 
+                required 
+                value={formData.categoria} 
+                onChange={handleChange}
+              >
+                <option value="">Selecione uma categoria...</option>
                 {['Academia', 'Artesanato', 'Comida', 'Doces', 'Esmalteria', 'Pet', 'Salão de Beleza', 'Saúde', 'Soluções Digitais'].map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
             </div>
 
+            {/* 🛠️ CIDADE / REGIÃO MUDADA PARA SELECT SEGURO */}
             <div className="col-md-6">
               <label className="form-label fw-bold small text-uppercase text-secondary">Cidade / Região</label>
-              <input type="text" name="regiao" className="form-control form-control-lg rounded-4 shadow-sm" placeholder="Ex: Itupeva - SP" required value={formData.regiao} onChange={handleChange} />
+              <select 
+                name="regiao" 
+                className="form-select form-control-lg rounded-4 shadow-sm" 
+                required 
+                value={formData.regiao} 
+                onChange={handleChange}
+              >
+                <option value="">Selecione a cidade...</option>
+                <option value="Itupeva, SP">Itupeva, SP</option>
+                <option value="Jundiaí, SP">Jundiaí, SP</option>
+              </select>
             </div>
 
             <div className="col-12">
               <label className="form-label fw-bold small text-uppercase text-secondary">Endereço Completo</label>
               <input type="text" name="endereco" className="form-control form-control-lg rounded-4 shadow-sm" placeholder="Rua, Número e Bairro" required value={formData.endereco} onChange={handleChange} />
+            </div>
+
+            <div className="col-12 mt-4">
+              <label className="form-label fw-bold small text-uppercase text-secondary">Breve descrição dos seus serviços (Até 200 letras)</label>
+              <textarea 
+                name="descricao" 
+                className="form-control rounded-4 shadow-sm" 
+                rows="3" 
+                placeholder="Ex: Especialistas em atendimento personalizado, serviços de qualidade e os melhores produtos do mercado..." 
+                required
+                value={formData.descricao} 
+                onChange={handleChange}
+              ></textarea>
+              <div className="text-end small mt-1 text-muted">{formData.descricao.length}/200</div>
             </div>
           </div>
 
@@ -89,7 +144,7 @@ function Cadastro({ setTelaAtual }) {
           <div className="my-5 p-4 rounded-4 text-center" style={{ border: '2px dashed #dee2e6', backgroundColor: '#fcfaff' }}>
             <label className="form-label fw-bold small text-uppercase d-block mb-3 text-secondary">Escolha o nível do anúncio</label>
             <div className="btn-group w-100 shadow-sm rounded-pill overflow-hidden" role="group">
-              <input type="radio" className="btn-check" name="plano" id="planFree" autoComplete="off" checked={formData.plano === 'free'} onChange={() => setFormData({...formData, plano: 'free', descricao: ''})} />
+              <input type="radio" className="btn-check" name="plano" id="planFree" autoComplete="off" checked={formData.plano === 'free'} onChange={() => setFormData({...formData, plano: 'free'})} />
               <label className="btn btn-outline-secondary py-3 fw-bold" htmlFor="planFree">PLANO GRATUITO</label>
 
               <input type="radio" className="btn-check" name="plano" id="planPremium" autoComplete="off" checked={formData.plano === 'premium'} onChange={() => setFormData({...formData, plano: 'premium'})} />
@@ -97,17 +152,11 @@ function Cadastro({ setTelaAtual }) {
             </div>
           </div>
 
-          {/* SE FOR PREMIUM: GANHA DESCRIÇÃO + 2 FOTOS + LINK */}
+          {/* SE FOR PREMIUM */}
           {formData.plano === 'premium' && (
             <div className="p-4 rounded-4 mb-4 border border-warning-subtle animate__animated animate__fadeIn" style={{ backgroundColor: '#fffdf5' }}>
               <h5 className="fw-bold text-warning-emphasis mb-4">✨ Recursos Exclusivos do Plano Premium</h5>
               
-              <div className="mb-4">
-                <label className="form-label fw-bold small text-uppercase">Breve descrição dos seus serviços (Até 200 letras)</label>
-                <textarea name="descricao" className="form-control rounded-4 border-warning-subtle shadow-sm" rows="3" placeholder="Ex: Especialistas em loiras e mega hair. Atendimento com horário marcado e os melhores produtos do mercado..." value={formData.descricao} onChange={handleChange}></textarea>
-                <div className="text-end small mt-1 text-muted">{formData.descricao.length}/200</div>
-              </div>
-
               <div className="mb-4">
                 <label className="form-label fw-bold small text-uppercase">Link do seu Site ou Catálogo</label>
                 <input type="url" name="link" className="form-control form-control-lg rounded-4 border-warning-subtle shadow-sm" placeholder="https://seusite.com" value={formData.link} onChange={handleChange} />
@@ -126,7 +175,7 @@ function Cadastro({ setTelaAtual }) {
             </div>
           )}
 
-          {/* SE FOR GRATUITO: REDES SOCIAIS */}
+          {/* SE FOR GRATUITO */}
           {formData.plano === 'free' && (
             <div className="row g-3 mb-4 animate__animated animate__fadeIn">
                <div className="col-md-6">
