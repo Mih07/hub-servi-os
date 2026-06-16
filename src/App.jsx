@@ -76,7 +76,7 @@ function App() {
   endereco: 'Rua do Teste, 123',
   descricao: 'Testando o layout do cardápio inteligente por dentro da plataforma.',
   imagem: '/placeholder.png', // Ou qualquer imagem que você tiver
-  plano: 'premium'
+  plano: 'gold'
 },
     { 
       id: 'local-5',
@@ -303,30 +303,33 @@ function App() {
                 </div>
               ) : (
                 lojasFiltradas.map((loja) => {
-                  const isPremium = loja.plano === 'premium';
-                  const idCarrossel = `carousel-${loja.nome ? loja.nome.replace(/[^a-zA-Z0-9]/g, '') : 'id'}`;
+                    const isPremium = loja.plano === 'premium';
+                    const isGold = loja.plano === 'gold';
+                    const isDestaque = isPremium || isGold;
+
+                    const idCarrossel = `carousel-${loja.nome ? loja.nome.replace(/[^a-zA-Z0-9]/g, '') : 'id'}`;
 
                   return (
                     <article key={loja.id || loja.nome} className="col">
                       <div 
-                        className={`card h-100 shadow-sm overflow-hidden position-relative ${isPremium ? 'border border-warning-subtle' : 'border-0'}`} 
+                        className={`card h-100 shadow-sm overflow-hidden position-relative ${isDestaque ? 'border border-warning-subtle' : 'border-0'}`} 
                         style={{ 
                           borderRadius: '18px', 
                           backgroundColor: '#fff',
-                          transform: isPremium ? 'scale(1.01)' : 'none'
+                          transform: isDestaque ? 'scale(1.01)' : 'none'
                         }}
                       >
-                        {isPremium && (
+                        {isDestaque && (
                           <div style={{
                             position: 'absolute', top: '15px', right: '15px', backgroundColor: '#ffc107',
                             color: '#000', fontWeight: 'bold', fontSize: '0.75rem', padding: '4px 12px',
                             borderRadius: '50px', boxShadow: '0 2px 4px rgba(0,0,0,0.15)', zIndex: '10'
                           }}>
-                            ⭐ PREMIUM
+                            {isGold ? '⭐ GOLD' : '⭐ PREMIUM'}
                           </div>
                         )}
 
-                        {isPremium && (loja.imagem2 || loja.imagem3) ? (
+                        {isDestaque && (loja.imagem2 || loja.imagem3) ? (
                           <div id={idCarrossel} className="carousel slide" data-bs-ride="carousel" style={{ height: '180px' }}>
                             <div className="carousel-inner h-100">
                               <div className="carousel-item active h-100" style={{ backgroundColor: '#f3d5f5' }}>
@@ -379,9 +382,12 @@ function App() {
                           </div>
 
                           <div className="d-flex align-items-center justify-content-between mt-3 pt-2 border-top" style={{ minHeight: '45px' }}>
-                            {isPremium ? (
+                            {isDestaque ? (
                               <>
-                                <span className="text-primary small fw-bold">Conteúdo Exclusivo</span>
+                                <span className="text-primary small fw-bold">
+                                  {isGold ? 'Plano Gold' : 'Conteúdo Exclusivo'}
+
+                                </span>
                                 {/* Condicional inteligente para links externos particulares ou cardápio interno */}
                                 <button 
                                   onClick={() => {
