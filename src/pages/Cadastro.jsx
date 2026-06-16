@@ -56,7 +56,9 @@ function Cadastro({ setTelaAtual }) {
       if (error) throw error;
 
       alert(`Sucesso! O cadastro de "${formData.nome}" foi salvo e enviado para análise.`);
-      setTelaAtual('home'); // Joga o usuário direto de volta para a Home após o sucesso
+      
+      // Ajustado para '' para voltar para a Home do App.jsx corretamente
+      setTelaAtual(''); 
     } catch (error) {
       console.error('Erro ao cadastrar no Supabase:', error.message);
       alert('Ops, ocorreu um erro ao salvar os dados. Tente novamente.');
@@ -73,7 +75,9 @@ function Cadastro({ setTelaAtual }) {
           </h2>
           <p className="text-muted">Escolha como quer exibir sua empresa para a região.</p>
         </div>
-        <button className="btn btn-light rounded-pill px-4 shadow-sm border" onClick={() => setTelaAtual('home')}>
+        
+        {/* Ajustado para '' no clique do botão Sair */}
+        <button className="btn btn-light rounded-pill px-4 shadow-sm border" onClick={() => setTelaAtual('')}>
           <i className="bi bi-x-lg me-2"></i>Sair
         </button>
       </div>
@@ -117,6 +121,9 @@ function Cadastro({ setTelaAtual }) {
                 <option value="">Selecione a cidade...</option>
                 <option value="Itupeva, SP">Itupeva, SP</option>
                 <option value="Jundiaí, SP">Jundiaí, SP</option>
+                <option value="Louveira, SP">Louveira, SP</option>
+                <option value="Cabreúva, SP">Cabreúva, SP</option>
+                <option value="Indaiatuba, SP">Indaiatuba, SP</option>
               </select>
             </div>
 

@@ -5,6 +5,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Cadastro from './pages/Cadastro';
+import Cardapio from './pages/Cardapio'; 
 import { supabase } from './supabaseClient'; // Conexão do Supabase
 
 function App() {
@@ -12,9 +13,12 @@ function App() {
   const [busca, setBusca] = useState('');
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Tudo');
   const [regiaoSelecionada, setRegiaoSelecionada] = useState('Itupeva, SP');
-  const [telaAtual, setTelaAtual] = useState('home');
+  
+  // Voltamos para string vazia '' para a Tela Principal (Guia) ser a primeira a carregar!
+  const [telaAtual, setTelaAtual] = useState(''); 
+  const [slugLojistaAtivo, setSlugLojistaAtivo] = useState(''); // Para controlar qual catálogo mostrar
 
-  // 2. Seus dados locais fixos (Protegidos aqui para você não perder!)
+  // 2. Seus dados locais fixos
   const lojasLocais = [
     { 
       id: 'local-1',
@@ -56,7 +60,7 @@ function App() {
     { 
       id: 'local-4',
       nome: 'Seu site, suacara- Soluções digitais', 
-      link: 'https://www.seusitesuacara.com',    
+      link: 'https://www.seusitesuacara.com',     
       categoria: 'Soluções Digitais',
       regiao: 'Itupeva, SP',
       endereco: 'Atendimento Online / Home Office',
@@ -64,9 +68,20 @@ function App() {
       plano: 'premium'
     },
     { 
+  id: 'marmitaria-da-deia', // O ID ou nome que será passado como slug
+  nome: 'Catálogo Demonstrativo (Em desenvolvimento)', 
+  link: '', // Deixando vazio, o Hub vai abrir a página interna do Cardápio!
+  categoria: 'Comida',
+  regiao: 'Itupeva, SP',
+  endereco: 'Rua do Teste, 123',
+  descricao: 'Testando o layout do cardápio inteligente por dentro da plataforma.',
+  imagem: '/placeholder.png', // Ou qualquer imagem que você tiver
+  plano: 'premium'
+},
+    { 
       id: 'local-5',
       nome: 'Mk Fitness Academia', 
-      link: 'https://www.mkfitnessacademia.com.br',    
+      link: 'https://www.mkfitnessacademia.com.br',     
       categoria: 'Academia',
       regiao: 'Itupeva, SP',
       endereco: 'Av. Itália, 581 - Centro',
@@ -75,7 +90,6 @@ function App() {
     }
   ];
 
-  // Estado que vai juntar as lojas locais + as lojas aprovadas do banco
   const [lojas, setLojas] = useState(lojasLocais);
   const [carregando, setCarregando] = useState(true);
 
@@ -87,15 +101,14 @@ function App() {
         const { data, error } = await supabase
           .from('servicos')
           .select('*')
-          .eq('aprovado', true); // Filtro de segurança: só traz os aprovados!
+          .eq('aprovado', true);
 
         if (error) throw error;
 
         if (data && data.length > 0) {
-          // Junta as suas fixas com as novas aprovadas do banco de dados
           setLojas([...lojasLocais, ...data]);
         } else {
-          setLojas(lojasLocais); // Se não tiver nada aprovado no banco, mostra as locais
+          setLojas(lojasLocais);
         }
       } catch (error) {
         console.error('Erro ao buscar dados do Supabase:', error.message);
@@ -109,27 +122,47 @@ function App() {
 
   // 4. Lógica do Filtro Inteligente
   const lojasFiltradas = lojas.filter((loja) => {
-    const termoBusca = busca.toLowerCase();
-    
-    const nomeLoja = loja.nome ? loja.nome.toLowerCase() : '';
-    const categoriaLoja = loja.categoria ? loja.categoria.toLowerCase() : '';
-    const regiaoLoja = loja.regiao || 'Itupeva, SP';
+  const termoBusca = busca.trim().toLowerCase();
 
-    const matchesBusca = nomeLoja.includes(termoBusca) || categoriaLoja.includes(termoBusca);
-    const matchesCategoria = categoriaSelecionada === 'Tudo' || loja.categoria === categoriaSelecionada;
-    const matchesRegiao = regiaoLoja === regiaoSelecionada;
+  const nomeLoja = loja.nome?.toLowerCase() || '';
+  const categoriaLoja = loja.categoria?.toLowerCase() || '';
+  const descricaoLoja = loja.descricao?.toLowerCase() || '';
+  const enderecoLoja = loja.endereco?.toLowerCase() || '';
+  const regiaoLoja = loja.regiao?.toLowerCase() || '';
 
-    return matchesBusca && matchesCategoria && matchesRegiao;
-  });
+  const matchesBusca =
+    termoBusca === '' ||
+    nomeLoja.includes(termoBusca) ||
+    categoriaLoja.includes(termoBusca) ||
+    descricaoLoja.includes(termoBusca) ||
+    enderecoLoja.includes(termoBusca);
+
+  const matchesCategoria =
+    categoriaSelecionada === 'Tudo' ||
+    loja.categoria === categoriaSelecionada;
+
+  const matchesRegiao =
+    regiaoSelecionada === '' ||
+    regiaoLoja.includes(regiaoSelecionada.toLowerCase().split(',')[0]);
+
+  return matchesBusca && matchesCategoria && matchesRegiao;
+});
 
   return (
     <div className="container-fluid py-4 bg-light min-vh-100 d-flex flex-column justify-content-between">
       <div>
-        <Navbar />
+        <Navbar setTelaAtual={setTelaAtual} />
             
-        {telaAtual === 'cadastro' ? (
+        {/* GERENCIAMENTO DE TELAS INTELIGENTE */}
+        {telaAtual === 'cadastro' && (
           <Cadastro setTelaAtual={setTelaAtual} />
-        ) : (
+        )}
+
+        {telaAtual === 'cardapio' && (
+          <Cardapio setTelaAtual={setTelaAtual} slugLojista={slugLojistaAtivo} />
+        )}
+
+        {telaAtual === '' && (
           <>
             <header className="bg-white border-bottom shadow-sm mb-4">
               <div className="container py-4 px-3">
@@ -161,22 +194,29 @@ function App() {
                         <option value="Indaiatuba, SP">Indaiatuba, SP</option>
                       </select>
                     </div>
-                  </div>a gal
+                  </div>
                 </div>
 
                 <div className="row justify-content-center">
                   <div className="col-lg-8">
                     <div className="input-group rounded-pill border overflow-hidden shadow-sm mb-3 bg-white">
-                      <span className="input-group-text bg-white border-0 ps-3" aria-hidden="true">🔍</span>
-                      <input 
-                        type="text" 
-                        className="form-control border-0 shadow-none py-2" 
-                        placeholder="O que você precisa hoje?" 
+                      <span className="input-group-text bg-white border-0 ps-3" aria-hidden="true">
+                        🔍
+                      </span>
+
+                      <input
+                        type="text"
+                        className="form-control border-0 shadow-none py-2"
+                        placeholder="O que você precisa hoje?"
                         value={busca}
                         onChange={(e) => setBusca(e.target.value)}
                         aria-label="Campo de busca por nome ou categoria"
                       />
                     </div>
+
+                    
+
+                    <div className="d-flex justify-content-center mb-5 px-3"></div>
                                 
                     <div className="d-flex justify-content-center mb-5 px-3">
                       <div className="dropdown w-100" style={{ maxWidth: '400px' }}>
@@ -243,12 +283,18 @@ function App() {
                   Quero Anunciar Grátis ou Premium
                 </button>
                 <small className="d-block text-muted mt-2" style={{ fontSize: '0.8rem' }}>
-                  *Os cadastros passam por análise de conteúdo e são liberados em até 24 horas pela administração.
+                  *Os cadastros passam por análise de conteúdo e são liberados em até 24 hours pela administração.
                 </small>
               </div>
             </div>
+            
 
             {/* GRID DE CARDS COM FEEDBACK DE CARREGAMENTO */}
+            <div className="container mb-3">
+              <p className="text-muted">
+                Resultados encontrados: {lojasFiltradas.length}
+              </p>
+            </div>
             <main className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 px-3 mx-auto" style={{ maxWidth: '1300px' }}>
               {carregando ? (
                 <div className="col-12 text-center py-5">
@@ -258,7 +304,6 @@ function App() {
               ) : (
                 lojasFiltradas.map((loja) => {
                   const isPremium = loja.plano === 'premium';
-                  const temCatalogo = isPremium && loja.link;
                   const idCarrossel = `carousel-${loja.nome ? loja.nome.replace(/[^a-zA-Z0-9]/g, '') : 'id'}`;
 
                   return (
@@ -319,14 +364,7 @@ function App() {
 
                         <div className="card-body p-4 d-flex flex-column justify-content-between">
                           <div>
-                            {temCatalogo ? (
-                              <a href={loja.link} target="_blank" rel="noopener noreferrer" className="text-decoration-none text-dark">
-                                <h3 className="h5 fw-bold mb-1">{loja.nome}</h3>
-                              </a>
-                            ) : (
-                              <h3 className="h5 fw-bold text-dark mb-1">{loja.nome}</h3>
-                            )}
-                            
+                            <h3 className="h5 fw-bold text-dark mb-1">{loja.nome}</h3>
                             <p className="text-muted small mb-2">{loja.categoria} • {loja.regiao}</p>
 
                             {loja.descricao && (
@@ -344,9 +382,21 @@ function App() {
                             {isPremium ? (
                               <>
                                 <span className="text-primary small fw-bold">Conteúdo Exclusivo</span>
-                                <a href={loja.link} target="_blank" rel="noopener noreferrer" className="btn btn-sm btn-primary rounded-pill px-4 fw-bold" style={{ fontSize: '0.85rem', backgroundColor: '#d63384', borderColor: '#d63384' }}>
+                                {/* Condicional inteligente para links externos particulares ou cardápio interno */}
+                                <button 
+                                  onClick={() => {
+                                    if (loja.link) {
+                                      window.open(loja.link, '_blank');
+                                    } else {
+                                      setSlugLojistaAtivo(loja.id || loja.nome);
+                                      setTelaAtual('cardapio');
+                                    }
+                                  }} 
+                                  className="btn btn-sm btn-primary rounded-pill px-4 fw-bold" 
+                                  style={{ fontSize: '0.85rem', backgroundColor: '#d63384', borderColor: '#d63384' }}
+                                >
                                   Ver Catálogo ➔
-                                </a>
+                                </button>
                               </>
                             ) : (
                               <>
