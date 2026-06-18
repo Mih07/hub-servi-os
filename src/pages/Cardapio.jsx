@@ -7,6 +7,7 @@ function Cardapio({ slugLojista, setTelaAtual }) {
   const [produtos, setProdutos] = useState([]);
   const [carrinho, setCarrinho] = useState([]);
   const [carregando, setCarregando] = useState(true);
+  const isGold = lojista?.plano === 'gold';
 
   // Estados para o Checkout Avançado
   const [verCheckout, setVerCheckout] = useState(false);
@@ -27,32 +28,37 @@ function Cardapio({ slugLojista, setTelaAtual }) {
   // 1. Puxar dados do Lojista e os Produtos do Supabase baseados no slug
   useEffect(() => {
     async function carregarDados() {
-      try {
-        setCarregando(true);
+  try {
+    setCarregando(true);
+    
+    // 1. Busca os dados do lojista na tabela única 'servicos'
         
-        const { data: dadosLojista, error: errLojista } = await supabase
-          .from('Lojistas')
-          .select('*')
-          .eq('slug', slugLojista)
-          .single();
+    const { data: dadosLojista, error: errLojista } = await supabase
+      .from('servicos') 
+      .select('*')
+      .eq('slug', slugLojista)
+      .order('id', { ascending: false }) // Pega o último cadastro feito (que deve ser o mais atualizado)
+      .limit(1) // Garante que virá apenas uma linha, mesmo que existam várias
+      .maybeSingle(); // O maybeSingle é mais seguro que o .single()
 
-        if (errLojista) throw errLojista;
-        setLojista(dadosLojista);
+    if (errLojista) throw errLojista;
+    setLojista(dadosLojista);
 
-        const { data: dadosProdutos, error: errProdutos } = await supabase
-          .from('produtos')
-          .select('*')
-          .eq('slug_lojista', slugLojista);
+    // 2. Busca os produtos relacionados
+    const { data: dadosProdutos, error: errProdutos } = await supabase
+      .from('produtos')
+      .select('*')
+      .eq('slug_lojista', slugLojista); // Mantém o elo pelo slug
 
-        if (errProdutos) throw errProdutos;
-        setProdutos(dadosProdutos || []);
+    if (errProdutos) throw errProdutos;
+    setProdutos(dadosProdutos || []);
 
-      } catch (error) {
-        console.error('Erro ao carregar o catálogo:', error.message);
-      } finally {
-        setCarregando(false);
-      }
-    }
+  } catch (error) {
+    console.error('Erro ao carregar:', error.message);
+  } finally {
+    setCarregando(false);
+  }
+}
 
     if (slugLojista) {
       carregarDados();
@@ -155,25 +161,50 @@ function Cardapio({ slugLojista, setTelaAtual }) {
   const categoriesUnicas = [...new Set(produtos.filter(p => p.categoria).map(p => p.categoria))];
 
   if (carregando) {
-    return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-primary" role="status" style={{ color: '#d63384' }}></div>
-        <p className="text-muted mt-2">Carregando catálogo...</p>
-      </div>
-    );
-  }
+  return (
+    <div className="text-center py-5">
+      <div className="spinner-border text-primary"></div>
+      <p className="text-muted mt-2">Carregando catálogo...</p>
+    </div>
+  );
+}
 
-  if (!lojista) {
-    return (
-      <div className="text-center py-5 container" style={{ maxWidth: '600px' }}>
-        <h3 className="fw-bold">Nenhum Cardápio Selecionado 🧐</h3>
-        <p className="text-muted small">Escolha uma das lojas Premium no nosso Guia para ver os produtos disponíveis.</p>
-        <button className="btn btn-primary rounded-pill mt-2 px-4 shadow-sm" style={{ backgroundColor: '#d63384', borderColor: '#d63384' }} onClick={() => setTelaAtual('')}>
-          Voltar para o Hub
-        </button>
-      </div>
-    );
-  }
+if (!lojista) {
+  return (
+    <div className="text-center py-5 container">
+      <h3 className="fw-bold">Nenhum Cardápio Selecionado 🧐</h3>
+      <p className="text-muted small">
+        Escolha uma loja no guia.
+      </p>
+      <button
+        className="btn btn-primary rounded-pill mt-2 px-4"
+        style={{ backgroundColor: '#d63384', borderColor: '#d63384' }}
+        onClick={() => setTelaAtual('')}
+      >
+        Voltar
+      </button>
+    </div>
+  );
+}
+
+if (lojista.plano !== 'gold') {
+  return (
+    <div className="text-center py-5 container">
+      <h3 className="fw-bold">🔒 Catálogo exclusivo</h3>
+      <p className="text-muted small">
+        Apenas planos Gold têm acesso ao Mini iFood.
+      </p>
+
+      <button
+        className="btn btn-primary rounded-pill mt-2 px-4"
+        style={{ backgroundColor: '#d63384', borderColor: '#d63384' }}
+        onClick={() => setTelaAtual('')}
+      >
+        Voltar
+      </button>
+    </div>
+  );
+}
 
   return (
     <div className="container py-3 mx-auto shadow-sm" style={{ maxWidth: '600px', backgroundColor: '#fff', minHeight: '100vh', borderRadius: '12px' }}>

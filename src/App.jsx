@@ -67,17 +67,7 @@ function App() {
       imagem: '/logoseusite.png',
       plano: 'premium'
     },
-    { 
-  id: 'marmitaria-da-deia', // O ID ou nome que será passado como slug
-  nome: 'Catálogo Demonstrativo (Em desenvolvimento)', 
-  link: '', // Deixando vazio, o Hub vai abrir a página interna do Cardápio!
-  categoria: 'Comida',
-  regiao: 'Itupeva, SP',
-  endereco: 'Rua do Teste, 123',
-  descricao: 'Testando o layout do cardápio inteligente por dentro da plataforma.',
-  imagem: '/placeholder.png', // Ou qualquer imagem que você tiver
-  plano: 'gold'
-},
+  
     { 
       id: 'local-5',
       nome: 'Mk Fitness Academia', 
@@ -280,7 +270,7 @@ function App() {
                   className="btn px-4 py-2 rounded-pill fw-bold border-0 shadow-sm" 
                   style={{ backgroundColor: '#d63384', color: '#fff' }}
                 >
-                  Quero Anunciar Grátis ou Premium
+                  Quero Anunciar Grátis, Premium ou Gold
                 </button>
                 <small className="d-block text-muted mt-2" style={{ fontSize: '0.8rem' }}>
                   *Os cadastros passam por análise de conteúdo e são liberados em até 24 hours pela administração.
@@ -394,7 +384,8 @@ function App() {
                                     if (loja.link) {
                                       window.open(loja.link, '_blank');
                                     } else {
-                                      setSlugLojistaAtivo(loja.id || loja.nome);
+                                      const identificador = loja.slug || loja.id; 
+                                      setSlugLojistaAtivo(identificador);
                                       setTelaAtual('cardapio');
                                     }
                                   }} 

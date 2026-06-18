@@ -29,41 +29,76 @@ function Cadastro({ setTelaAtual }) {
     if (file) setFile(file);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+    const uploadImage = async (file) => {
+   const fileName = `${Date.now()}-${file.name.replace(/\s/g, '-')}`; 
 
-    try {
-      // Mandando os dados direto para a tabela do Supabase
-      const { data, error } = await supabase
-        .from('servicos')
-        .insert([
-          {
-            nome: formData.nome,
-            categoria: formData.categoria,
-            regiao: formData.regiao,
-            endereco: formData.endereco,
-            plano: formData.plano,
-            descricao: formData.descricao, // Salva sempre a descrição geral
-            link: formData.plano === 'premium' ? formData.link : null,
-            whatsapp: formData.plano === 'free' ? formData.whatsapp : null,
-            instagram: formData.plano === 'free' ? formData.instagram : null,
-            imagem: logoFile ? `/${logoFile.name}` : '/placeholder.png',
-            imagem2: fotoExtra1 ? `/${fotoExtra1.name}` : null,
-            imagem3: fotoExtra2 ? `/${fotoExtra2.name}` : null,
-          },
-        ]);
+    const { data, error } = await supabase.storage
+      .from('imagens')
+      .upload(fileName, file);
 
-      if (error) throw error;
+    if (error) throw error;
 
-      alert(`Sucesso! O cadastro de "${formData.nome}" foi salvo e enviado para análise.`);
-      
-      // Ajustado para '' para voltar para a Home do App.jsx corretamente
-      setTelaAtual(''); 
-    } catch (error) {
-      console.error('Erro ao cadastrar no Supabase:', error.message);
-      alert('Ops, ocorreu um erro ao salvar os dados. Tente novamente.');
-    }
+    const { data: url } = supabase.storage
+      .from('imagens')
+      .getPublicUrl(fileName);
+
+    return url.publicUrl;
   };
+
+  const gerarSlug = (nome) => {
+  return nome
+    .toString()
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')     // Substitui espaços por hífen
+    .replace(/[^\w-]+/g, '')  // Remove caracteres especiais
+    .replace(/--+/g, '-');    // Remove hífens duplicados
+};
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    // 1. UPLOAD DAS IMAGENS
+    const logoUrl = logoFile ? await uploadImage(logoFile) : null;
+    const img2 = fotoExtra1 ? await uploadImage(fotoExtra1) : null;
+    const img3 = fotoExtra2 ? await uploadImage(fotoExtra2) : null;
+
+    // 2. GERAR O SLUG A PARTIR DO NOME
+    const slugGerado = gerarSlug(formData.nome);
+
+    // 3. SALVAR NO SUPABASE (Incluindo o slug!)
+    const { data, error } = await supabase
+      .from('servicos')
+      .insert([
+        {
+          nome: formData.nome,
+          slug: slugGerado, // <--- ADICIONE ESTA LINHA
+          categoria: formData.categoria,
+          regiao: formData.regiao,
+          endereco: formData.endereco,
+          plano: formData.plano,
+          descricao: formData.descricao,
+          link: (formData.plano === 'premium' || formData.plano === 'gold') ? formData.link : null,
+          whatsapp: formData.whatsapp,
+          instagram: formData.instagram,
+          imagem: logoUrl,
+          imagem2: img2,
+          imagem3: img3,
+        },
+      ]);
+
+    if (error) throw error;
+
+    alert(`Sucesso! A loja "${formData.nome}" foi cadastrada.`);
+    setTelaAtual('');
+
+  } catch (error) {
+    console.error('Erro ao cadastrar no Supabase:', error.message);
+    alert('Erro ao salvar: ' + error.message); // Exibe o erro real para debug
+  }
+};
 
   return (
     <div className="container my-5 animate__animated animate__fadeIn" style={{ maxWidth: '850px' }}>
@@ -149,13 +184,75 @@ function Cadastro({ setTelaAtual }) {
 
           {/* SELEÇÃO DO PLANO */}
           <div className="my-5 p-4 rounded-4 text-center" style={{ border: '2px dashed #dee2e6', backgroundColor: '#fcfaff' }}>
-            <label className="form-label fw-bold small text-uppercase d-block mb-3 text-secondary">Escolha o nível do anúncio</label>
-            <div className="btn-group w-100 shadow-sm rounded-pill overflow-hidden" role="group">
-              <input type="radio" className="btn-check" name="plano" id="planFree" autoComplete="off" checked={formData.plano === 'free'} onChange={() => setFormData({...formData, plano: 'free'})} />
-              <label className="btn btn-outline-secondary py-3 fw-bold" htmlFor="planFree">PLANO GRATUITO</label>
+            <label className="form-label fw-bold small text-uppercase d-block mb-3 text-secondary">Escolha o plano ideal para a sua empresa</label>
+            <div className="row g-3">
 
-              <input type="radio" className="btn-check" name="plano" id="planPremium" autoComplete="off" checked={formData.plano === 'premium'} onChange={() => setFormData({...formData, plano: 'premium'})} />
-              <label className="btn btn-outline-warning py-3 fw-bold" htmlFor="planPremium">⭐ PLANO PREMIUM</label>
+              <div className="col-md-4">
+                <div
+                  className={`card h-100 text-center shadow-sm ${
+                    formData.plano === 'free' ? 'border-primary border-3' : ''
+                  }`}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setFormData({ ...formData, plano: 'free' })}
+                >
+                  <div className="card-body">
+                    <h5 className="fw-bold">Plano Gratuito</h5>
+                    <h3 className="text-success">R$ 0</h3>
+                    <ul className="list-unstyled small">
+                      <li>✓ Exibição no guia</li>
+                      <li>✓ WhatsApp</li>
+                      <li>✓ Instagram</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-4">
+                <div
+                  className={`card h-100 text-center shadow-sm ${
+                    formData.plano === 'premium' ? 'border-warning border-3' : ''
+                  }`}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setFormData({ ...formData, plano: 'premium' })}
+                >
+                  <div className="card-body">
+                    <h5 className="fw-bold">⭐ Premium</h5>
+                    <h3 className="text-warning">R$ 29,90</h3>
+                    <ul className="list-unstyled small">
+                      <li>✓ Tudo do Gratuito</li>
+                      <li>✓ Carrossel de fotos</li>
+                      <li>✓ Link externo</li>
+                      <li>✓ Destaque Premium</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-4">
+                <div
+                  className={`card h-100 text-center shadow-sm ${
+                    formData.plano === 'gold' ? 'border-dark border-3' : ''
+                  }`}
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => setFormData({ ...formData, plano: 'gold' })}
+                >
+                  <div className="card-body">
+                    <h5 className="fw-bold">⭐ GOLD</h5>
+                    <h3 style={{ color: '#d4af37' }}>R$ 89,90</h3>
+                    <ul className="list-unstyled small">
+                      <li>✓ Tudo do Premium</li>
+                      <li>✓ Catálogo interno  estilo iFood</li>
+                      <li>✓ Produtos cadastrados</li>
+                      <li>✓ Carrinho de Pedidos</li>
+                      <li>✓ Pedidos via WhatsApp automático</li>
+                      <li>✓ Integração com Google Maps</li>
+                      <li>✓ Produtos cadastrados</li>
+                      <li>✓ Destaque Gold</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
 
