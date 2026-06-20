@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 import './App.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { AiFillStar, AiOutlineHeart, AiFillHeart, AiOutlineShareAlt } from 'react-icons/ai';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Cadastro from './pages/Cadastro';
-import Cardapio from './pages/Cardapio'; 
+import Cardapio from './pages/Cardapio';
 import { supabase } from './supabaseClient'; // Conexão do Supabase
-
 function App() {
   // 1. Estados Existentes
   const [busca, setBusca] = useState('');
@@ -16,7 +16,49 @@ function App() {
   
   // Voltamos para string vazia '' para a Tela Principal (Guia) ser a primeira a carregar!
   const [telaAtual, setTelaAtual] = useState(''); 
-  const [slugLojistaAtivo, setSlugLojistaAtivo] = useState(''); // Para controlar qual catálogo mostrar
+  const [slugLojistaAtivo, setSlugLojistaAtivo] = useState('');
+
+  // 1. Estado dos favoritos (já iniciando com o que estiver no localStorage)
+  const [favoritos, setFavoritos] = useState(() => {
+  const salvos = localStorage.getItem('meusFavoritos');
+  const refsLojas = {};
+    return salvos ? JSON.parse(salvos) : [];
+  });
+
+  // 2. Função para alternar o status do favorito
+  const toggleFavorito = (id) => {
+    setFavoritos(prev => 
+      prev.includes(id) ? prev.filter(fid => fid !== id) : [...prev, id]
+    );
+  };
+
+  // 3. Função para registrar cliques no Supabase
+const registrarClique = async (lojaId, tipo) => {
+  try {
+    const { error } = await supabase
+      .from('estatisticas') // Nome da sua tabela
+      .insert([
+        { loja_id: lojaId, tipo_clique: tipo }
+      ]);
+
+    if (error) throw error;
+    console.log(`Clique registrado: ${tipo} na loja ${lojaId}`);
+  } catch (err) {
+    console.error("Erro ao registrar estatística:", err.message);
+  }
+};
+
+  // 3. Efeito que salva automaticamente no localStorage sempre que o estado mudar
+  // Efeito para o Título da Página (Dinâmico)
+  useEffect(() => {
+    if (telaAtual === 'favoritos') {
+      document.title = "Favoritos ❤️ | Hub Serviços";
+    } else if (telaAtual === 'cadastro') {
+      document.title = "Anunciar no Hub Serviços";
+    } else {
+      document.title = "Hub Serviços | Guia de Comércio e Serviços Completo";
+    }
+  }, [telaAtual]); // Agora ele monitora a mudança de tela
 
   // 2. Seus dados locais fixos
   const lojasLocais = [
@@ -111,62 +153,93 @@ function App() {
   }, [telaAtual]);
 
   // 4. Lógica do Filtro Inteligente
-  const lojasFiltradas = lojas.filter((loja) => {
-  const termoBusca = busca.trim().toLowerCase();
+  // 1. Define o peso de cada plano para a ordenação
+  const pesos = { 'gold': 1, 'premium': 2, 'free': 3 };
 
-  const nomeLoja = loja.nome?.toLowerCase() || '';
-  const categoriaLoja = loja.categoria?.toLowerCase() || '';
-  const descricaoLoja = loja.descricao?.toLowerCase() || '';
-  const enderecoLoja = loja.endereco?.toLowerCase() || '';
-  const regiaoLoja = loja.regiao?.toLowerCase() || '';
+  const lojasFiltradas = lojas
+    .filter((loja) => {
+      const termoBusca = busca.trim().toLowerCase();
 
-  const matchesBusca =
-    termoBusca === '' ||
-    nomeLoja.includes(termoBusca) ||
-    categoriaLoja.includes(termoBusca) ||
-    descricaoLoja.includes(termoBusca) ||
-    enderecoLoja.includes(termoBusca);
+      const nomeLoja = loja.nome?.toLowerCase() || '';
+      const categoriaLoja = loja.categoria?.toLowerCase() || '';
+      const descricaoLoja = loja.descricao?.toLowerCase() || '';
+      const enderecoLoja = loja.endereco?.toLowerCase() || '';
+      const regiaoLoja = loja.regiao?.toLowerCase() || '';
 
-  const matchesCategoria =
-    categoriaSelecionada === 'Tudo' ||
-    loja.categoria === categoriaSelecionada;
+      const matchesBusca =
+        termoBusca === '' ||
+        nomeLoja.includes(termoBusca) ||
+        categoriaLoja.includes(termoBusca) ||
+        descricaoLoja.includes(termoBusca) ||
+        enderecoLoja.includes(termoBusca);
 
-  const matchesRegiao =
-    regiaoSelecionada === '' ||
-    regiaoLoja.includes(regiaoSelecionada.toLowerCase().split(',')[0]);
+      const matchesCategoria =
+        categoriaSelecionada === 'Tudo' ||
+        loja.categoria === categoriaSelecionada;
 
-  return matchesBusca && matchesCategoria && matchesRegiao;
-});
+      const matchesRegiao =
+        regiaoSelecionada === '' ||
+        regiaoLoja.includes(regiaoSelecionada.toLowerCase().split(',')[0]);
+
+      return matchesBusca && matchesCategoria && matchesRegiao;
+    })
+    .sort((a, b) => {
+      // Ordena de acordo com o peso definido acima. 
+      // Se a loja não tiver um plano mapeado, ganha peso 99 (vai para o fim)
+      return (pesos[a.plano] || 99) - (pesos[b.plano] || 99);
+    });
 
   return (
-    <div className="container-fluid py-4 bg-light min-vh-100 d-flex flex-column justify-content-between">
-      <div>
-        <Navbar setTelaAtual={setTelaAtual} />
-            
-        {/* GERENCIAMENTO DE TELAS INTELIGENTE */}
-        {telaAtual === 'cadastro' && (
-          <Cadastro setTelaAtual={setTelaAtual} />
-        )}
 
-        {telaAtual === 'cardapio' && (
-          <Cardapio setTelaAtual={setTelaAtual} slugLojista={slugLojistaAtivo} />
-        )}
+        <div className="container-fluid py-4 bg-light min-vh-100 d-flex flex-column justify-content-between">
+          <div>
+            <Navbar setTelaAtual={setTelaAtual} />
+                
+            {/* GERENCIAMENTO DE TELAS INTELIGENTE */}
+            {telaAtual === 'cadastro' && (
+              <Cadastro setTelaAtual={setTelaAtual} />
+            )}
+
+            {/* NOVA TELA DE FAVORITOS */}
+            {telaAtual === 'favoritos' && (
+              <ListaDeLojas 
+                lojas={lojasFiltradas.filter(loja => favoritos.includes(loja.id))} 
+                titulo="Seus Favoritos ❤️" 
+              />
+            )}
+
+            {/* Onde você exibe as lojas normais (ex: quando telaAtual for 'home' ou '/') */}
+            {telaAtual === 'home' && (
+              <ListaDeLojas lojas={lojasFiltradas} titulo="Todas as Lojas" />
+            )}
+          
+            {telaAtual === 'cardapio' && (
+              <Cardapio setTelaAtual={setTelaAtual} slugLojista={slugLojistaAtivo} />
+            )}
 
         {telaAtual === '' && (
           <>
             <header className="bg-white border-bottom shadow-sm mb-4">
               <div className="container py-4 px-3">
                 <div className="row align-items-start mb-4">
-                  <div className="col-lg-8 text-start">
-                    <h1 className="fw-bold mb-2" style={{ color: '#5d4037', fontSize: '2.2rem', letterSpacing: '-1.5px', lineHeight: '1.1' }}>
+                  <div className="col-lg-8 d-flex align-items-center">
+                    <div className="mb-2">
+                      <img 
+                        src="/logo-hub.png" 
+                        alt="Hub Serviços" 
+                        style={{ maxWidth: '80px', height: 'auto', objectFit: 'cover', borderRadius: '15px' }} 
+                        className="me-3 shadow-sm"
+                      />
+                    </div>
+                    <h1 className="fw-bold mb-2" style={{ color: '#5d4037', fontSize: '1.9rem', letterSpacing: '-1.0px', }}>
                       Guia de Serviços e Comércio Local | <span className="fw-bolder ms-2" style={{color: '#d63384', fontWeight: 900}}>Hub Serviços</span>
                     </h1>
-                    <p className="text-muted mt-4" style={{ maxWidth: '550px', fontSize: '1.05rem' }}>
+                  </div>
+                  <p className="text-muted mt-4" style={{ maxWidth: '450px', fontSize: '1.05rem' }}>
                       Encontre os melhores profissionais e lojas da região. 
                       Clique no banner para acessar <strong>catálogos, cardápios e contatos diretos.</strong>
-                    </p>
-                  </div>
-                  
+                  </p>
+
                   <div className="col-lg-4 text-lg-end mt-3 mt-lg-0">
                     <div className="d-inline-flex align-items-center bg-light px-3 py-2 rounded-pill border shadow-sm" style={{ backgroundColor: '#fff9e6', borderColor: '#ffe69c' }}>
                       <span className="me-2" aria-hidden="true">📍</span>
@@ -259,6 +332,7 @@ function App() {
                   </div>
                 </div>
               </div>
+            
             </header>
 
             <div className="container px-3 mb-4">
@@ -285,143 +359,190 @@ function App() {
                 Resultados encontrados: {lojasFiltradas.length}
               </p>
             </div>
-            <main className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 px-3 mx-auto" style={{ maxWidth: '1300px' }}>
-              {carregando ? (
-                <div className="col-12 text-center py-5">
-                  <div className="spinner-border" role="status" style={{ color: '#d63384' }}></div>
-                  <p className="text-muted mt-2">Sincronizando guia com o servidor...</p>
-                </div>
-              ) : (
-                lojasFiltradas.map((loja) => {
-                    const isPremium = loja.plano === 'premium';
-                    const isGold = loja.plano === 'gold';
-                    const isDestaque = isPremium || isGold;
 
-                    const idCarrossel = `carousel-${loja.nome ? loja.nome.replace(/[^a-zA-Z0-9]/g, '') : 'id'}`;
+{/* Seção de Favoritos Rápidos */}
 
-                  return (
-                    <article key={loja.id || loja.nome} className="col">
-                      <div 
-                        className={`card h-100 shadow-sm overflow-hidden position-relative ${isDestaque ? 'border border-warning-subtle' : 'border-0'}`} 
-                        style={{ 
-                          borderRadius: '18px', 
-                          backgroundColor: '#fff',
-                          transform: isDestaque ? 'scale(1.01)' : 'none'
-                        }}
-                      >
-                        {isDestaque && (
-                          <div style={{
-                            position: 'absolute', top: '15px', right: '15px', backgroundColor: '#ffc107',
-                            color: '#000', fontWeight: 'bold', fontSize: '0.75rem', padding: '4px 12px',
-                            borderRadius: '50px', boxShadow: '0 2px 4px rgba(0,0,0,0.15)', zIndex: '10'
-                          }}>
-                            {isGold ? '⭐ GOLD' : '⭐ PREMIUM'}
-                          </div>
-                        )}
+{favoritos.length > 0 && (
+  <section className="container mb-4">
+    {/* Título e Ícone de Favoritos (Não clicável) */}
+    <div className="container mt-4 mb-2">
+      <div className="d-flex align-items-center">
+        <i 
+          className="bi bi-heart-fill" 
+          style={{ color: '#d63384', fontSize: '1.2rem' }}
+        ></i>
+        <h5 className="fw-bold mb-0 ms-2" style={{ color: '#d63384' }}>
+          Favoritos
+        </h5>
+      </div>
+    </div>
 
-                        {isDestaque && (loja.imagem2 || loja.imagem3) ? (
-                          <div id={idCarrossel} className="carousel slide" data-bs-ride="carousel" style={{ height: '180px' }}>
-                            <div className="carousel-inner h-100">
-                              <div className="carousel-item active h-100" style={{ backgroundColor: '#f3d5f5' }}>
-                                <img src={loja.imagem} alt={loja.nome} className="w-100 h-100" style={{ objectFit: 'contain', padding: '15px' }} />
-                              </div>
-                              {loja.imagem2 && (
-                                <div className="carousel-item h-100" style={{ backgroundColor: '#f3d5f5' }}>
-                                  <img src={loja.imagem2} alt="Extra" className="w-100 h-100" style={{ objectFit: 'cover' }} />
-                                </div>
-                              )}
-                              {loja.imagem3 && (
-                                <div className="carousel-item h-100" style={{ backgroundColor: '#f3d5f5' }}>
-                                  <img src={loja.imagem3} alt="Extra" className="w-100 h-100" style={{ objectFit: 'cover' }} />
-                                </div>
-                              )}
-                            </div>
-                            <button className="carousel-control-prev" type="button" data-bs-target={`#${idCarrossel}`} data-bs-slide="prev">
-                              <span className="carousel-control-prev-icon" aria-hidden="true"></span>
-                            </button>
-                            <button className="carousel-control-next" type="button" data-bs-target={`#${idCarrossel}`} data-bs-slide="next">
-                              <span className="carousel-control-next-icon" aria-hidden="true"></span>
-                            </button>
-                          </div>
-                        ) : (
-                          <div style={{ overflow: 'hidden', backgroundColor: '#f3d5f5', height: '180px' }}>
-                            {loja.imagem ? (
-                              <img src={loja.imagem} alt={loja.nome} className="w-100 h-100" style={{ objectFit: 'contain', padding: '15px' }} loading="lazy" />
-                            ) : (
-                              <div className="d-flex align-items-center justify-content-center h-100">
-                                <span className="fw-bold text-secondary opacity-75">{loja.categoria}</span>
-                              </div>
-                            )}
-                          </div>
-                        )}
+{/* Abaixo daqui começa o seu .map que lista as logos */}
+    <div className="d-flex gap-3 overflow-auto pb-2">
+      {lojasFiltradas
+        .filter(loja => favoritos.includes(loja.id))
+        .map(loja => (
+          <a 
+            key={loja.id}
+            href={`#${loja.id}`} 
+            className="d-flex flex-column align-items-center text-decoration-none"
+            style={{ width: '90px' }} // Define uma largura fixa para o ícone
+          >
+            <div className="rounded-circle shadow-sm overflow-hidden border" style={{ width: '80px', height: '80px' }}>
+              <img 
+                src={loja.imagem} 
+                alt={loja.nome} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              />
+            </div>
+            <span className="small text-truncate mt-1" style={{ fontSize: '0.85rem', color: '#333', maxWidth: '90px' }}>
+              {loja.nome}
+            </span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+)}
+            
+    <main className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 px-3 mx-auto" style={{ maxWidth: '1300px' }}>
+            {carregando ? (
+              <div className="col-12 text-center py-5">
+                <div className="spinner-border" role="status" style={{ color: '#d63384' }}></div>
+                <p className="text-muted mt-2">Sincronizando guia com o servidor...</p>
+              </div>
+            ) : (
+        lojasFiltradas.map((loja) => {
+          const isPremium = loja.plano === 'premium';
+          const isGold = loja.plano === 'gold';
+          const isDestaque = isPremium || isGold;
+          const idCarrossel = `carousel-${loja.nome ? loja.nome.replace(/[^a-zA-Z0-9]/g, '') : 'id'}`;
 
-                        <div className="card-body p-4 d-flex flex-column justify-content-between">
-                          <div>
-                            <h3 className="h5 fw-bold text-dark mb-1">{loja.nome}</h3>
-                            <p className="text-muted small mb-2">{loja.categoria} • {loja.regiao}</p>
+          return (
+            <article key={loja.id || loja.nome} id={loja.id} className="col">
+              <div 
+                className={`card h-100 shadow-sm overflow-hidden position-relative ${isDestaque ? 'border border-warning-subtle' : 'border-0'}`} 
+                style={{ borderRadius: '18px', backgroundColor: '#fff', transform: isDestaque ? 'scale(1.01)' : 'none' }}
+              >
+                {isDestaque && (
+                  <div style={{
+                    position: 'absolute', top: '15px', right: '15px', 
+                    backgroundColor: isGold ? '#ff7b00' : '#ffc107', // Ouro para Gold, Amarelo para Premium
+                    color: '#000', fontWeight: 'bold', fontSize: '0.75rem', padding: '4px 12px',
+                    borderRadius: '50px', boxShadow: '0 2px 4px rgba(0,0,0,0.15)', zIndex: '10'
+                  }}>
+                    {isGold ? '⭐ PLANO GOLD' : '⭐ PREMIUM'}
+                  </div>
+                )}
 
-                            {loja.descricao && (
-                              <p className="text-secondary small bg-light p-2 rounded-3 mb-2 border-start border-3" style={{ fontStyle: 'italic', fontSize: '0.85rem', lineHeight: '1.3', borderLeftColor: '#d63384' }}>
-                                "{loja.descricao}"
-                              </p>
-                            )}
-
-                            <p className="text-secondary small mb-3" style={{ fontSize: '0.85rem' }}>
-                              📍 <em>{loja.endereco}</em>
-                            </p>
-                          </div>
-
-                          <div className="d-flex align-items-center justify-content-between mt-3 pt-2 border-top" style={{ minHeight: '45px' }}>
-                            {isDestaque ? (
-                              <>
-                                <span className="text-primary small fw-bold">
-                                  {isGold ? 'Plano Gold' : 'Conteúdo Exclusivo'}
-
-                                </span>
-                                {/* Condicional inteligente para links externos particulares ou cardápio interno */}
-                                <button 
-                                  onClick={() => {
-                                    if (loja.link) {
-                                      window.open(loja.link, '_blank');
-                                    } else {
-                                      const identificador = loja.slug || loja.id; 
-                                      setSlugLojistaAtivo(identificador);
-                                      setTelaAtual('cardapio');
-                                    }
-                                  }} 
-                                  className="btn btn-sm btn-primary rounded-pill px-4 fw-bold" 
-                                  style={{ fontSize: '0.85rem', backgroundColor: '#d63384', borderColor: '#d63384' }}
-                                >
-                                  Ver Catálogo ➔
-                                </button>
-                              </>
-                            ) : (
-                              <>
-                                <div className="d-flex gap-2">
-                                  {loja.whatsapp && (
-                                    <a href={loja.whatsapp} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-center text-decoration-none text-white shadow-sm" style={{ width: '36px', height: '36px', backgroundColor: '#25D366', borderRadius: '50%', fontSize: '1.1rem' }}>
-                                      <i className="bi bi-whatsapp"></i>
-                                    </a>
-                                  )}
-                                  {loja.instagram && (
-                                    <a href={loja.instagram} target="_blank" rel="noopener noreferrer" className="d-flex align-items-center justify-content-center text-decoration-none text-white shadow-sm" style={{ width: '36px', height: '36px', background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', borderRadius: '50%', fontSize: '1.1rem' }}>
-                                      <i className="bi bi-instagram"></i>
-                                    </a>
-                                  )}
-                                </div>
-                                <span className="text-muted small">Contato Direto</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
+                
+                {isDestaque && (loja.imagem2 || loja.imagem3) ? (
+                  <div id={idCarrossel} className="carousel slide" data-bs-ride="carousel" style={{ height: '180px' }}>
+                    <div className="carousel-inner h-100">
+                      <div className="carousel-item active h-100" style={{ backgroundColor: '#f3d5f5' }}>
+                        <img src={loja.imagem} alt={loja.nome} className="w-100 h-100" style={{ objectFit: 'contain', padding: '15px' }} />
                       </div>
-                    </article>
-                  );
-                })
-              )}
-            </main>
+                      {loja.imagem2 && <div className="carousel-item h-100" style={{ backgroundColor: '#f3d5f5' }}><img src={loja.imagem2} alt="Extra" className="w-100 h-100" style={{ objectFit: 'cover' }} /></div>}
+                      {loja.imagem3 && <div className="carousel-item h-100" style={{ backgroundColor: '#f3d5f5' }}><img src={loja.imagem3} alt="Extra" className="w-100 h-100" style={{ objectFit: 'cover' }} /></div>}
+                    </div>
+                    <button className="carousel-control-prev" type="button" data-bs-target={`#${idCarrossel}`} data-bs-slide="prev"><span className="carousel-control-prev-icon"></span></button>
+                    <button className="carousel-control-next" type="button" data-bs-target={`#${idCarrossel}`} data-bs-slide="next"><span className="carousel-control-next-icon"></span></button>
+                  </div>
+                ) : (
+                  <div style={{ overflow: 'hidden', backgroundColor: '#f3d5f5', height: '180px' }}>
+                    {loja.imagem ? <img src={loja.imagem} alt={loja.nome} className="w-100 h-100" style={{ objectFit: 'contain', padding: '15px' }} loading="lazy" /> : <div className="d-flex align-items-center justify-content-center h-100"><span className="fw-bold text-secondary opacity-75">{loja.categoria}</span></div>}
+                  </div>
+                )}
 
-            {!carregando && lojasFiltradas.length === 0 && (
+                <div className="card-body p-4 d-flex flex-column">
+                  <h3 className="h5 fw-bold text-dark mb-1">{loja.nome}</h3>
+                  
+                 
+                  <div className="mb-2">
+                    {[1, 2, 3, 4, 5].map((estrela) => (
+                      <i 
+                        key={estrela} 
+                        className={`bi ${estrela <= (loja.nota || 5) ? 'bi-star-fill text-warning' : 'bi-star text-muted'}`}
+                        style={{ fontSize: '0.75rem', marginRight: '2px' }}
+                      ></i>
+                    ))}
+                    <span className="text-muted small ms-1">({loja.avaliacoes || 0})</span>
+                  </div>
+
+                  <p className="text-muted small mb-2">{loja.categoria} • {loja.regiao}</p>
+                  
+                  {loja.descricao && (
+                    <p className="text-secondary small bg-light p-2 rounded-3 mb-2 border-start border-3" style={{ fontStyle: 'italic', fontSize: '0.85rem', lineHeight: '1.3', borderLeftColor: '#d63384' }}>
+                      "{loja.descricao}"
+                    </p>
+                  )}
+
+                  
+                  <div className="d-flex gap-2 mb-3">
+                    <button onClick={() => toggleFavorito(loja.id)} className="btn btn-sm btn-outline-secondary rounded-circle border-0" style={{ width: '35px', height: '35px', color: favoritos.includes(loja.id) ? '#d63384' : '#6c757d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      {favoritos.includes(loja.id) ? <AiFillHeart size={20} /> : <AiOutlineHeart size={20} />}
+                    </button>
+                    <button onClick={() => { navigator.clipboard.writeText(window.location.href); alert("Link copiado!"); }} className="btn btn-sm btn-outline-secondary rounded-circle border-0" style={{ width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <AiOutlineShareAlt size={20} />
+                    </button>
+                  </div>
+
+                  
+                  <div className="mt-auto d-flex align-items-center justify-content-between pt-2 border-top">
+                    {isDestaque ? (
+                      <button 
+                        onClick={() => { 
+                          // Esta linha abaixo é a que envia o dado para o Supabase
+                          registrarClique(loja.id, 'catalogo'); 
+                          
+                          // E aqui continua a ação que você já tinha
+                          if (loja.link) window.open(loja.link, '_blank'); 
+                          else { setSlugLojistaAtivo(loja.slug || loja.id); setTelaAtual('cardapio'); } 
+                        }} 
+                        className="btn btn-sm btn-primary rounded-pill px-4 fw-bold w-100" 
+                        style={{ fontSize: '0.85rem', backgroundColor: '#d63384', borderColor: '#d63384' }}
+                      >
+                        Ver Catálogo ➔
+                      </button>
+                    ) : (
+                      <div className="d-flex gap-2">
+                        {loja.whatsapp && (
+                          <a 
+                            href={loja.whatsapp} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            onClick={() => registrarClique(loja.id, 'whatsapp')} // Adicione aqui
+                            className="d-flex align-items-center justify-content-center text-decoration-none text-white shadow-sm" 
+                            style={{ width: '36px', height: '36px', backgroundColor: '#25D366', borderRadius: '50%', fontSize: '1.1rem' }}
+                          >
+                            <i className="bi bi-whatsapp"></i>
+                          </a>
+                        )}
+
+                        {loja.instagram && (
+                          <a 
+                            href={loja.instagram} 
+                            target="_blank" 
+                            rel="noopener noreferrer" 
+                            onClick={() => registrarClique(loja.id, 'instagram')} // Adicione aqui
+                            className="d-flex align-items-center justify-content-center text-decoration-none text-white shadow-sm" 
+                            style={{ width: '36px', height: '36px', background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', borderRadius: '50%', fontSize: '1.1rem' }}
+                          >
+                            <i className="bi bi-instagram"></i>
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </article>
+          );
+        })
+      )}
+    </main>
+
+       {!carregando && lojasFiltradas.length === 0 && (
               <div className="text-center py-5">
                 <p className="text-muted">Ainda não temos parceiros em {regiaoSelecionada} nesta categoria. 🧐</p>
               </div>
@@ -429,9 +550,10 @@ function App() {
           </>
         )}
       </div>
-      <Footer />
-    </div>
-  );
-}
+      <Footer/>
+    </div> 
+)};
+
+
 
 export default App;
