@@ -79,6 +79,8 @@ const registrarClique = async (lojaId, tipo) => {
       regiao: 'Itupeva, SP',
       endereco: 'Atendimento Online / Home Office',
       imagem: '/logoseusite.png',
+      imagem2: '/cardapio.png',
+      imagem3: '/site.png',
       plano: 'premium'
     }
   ];
