@@ -48,6 +48,14 @@ const registrarClique = async (lojaId, tipo) => {
   }
 };
 
+// Função para montar o link com o rastreador de forma segura
+  const montarLinkSeguro = (link) => {
+    if (!link) return "#";
+    // Se o link já tem '?', usamos '&', se não, usamos '?'
+    const conector = link.includes('?') ? '&' : '?';
+    return `${link}${conector}utm_source=hubservicos`;
+  };
+
   // 3. Efeito que salva automaticamente no localStorage sempre que o estado mudar
   // Efeito para o Título da Página (Dinâmico)
   useEffect(() => {
@@ -62,62 +70,15 @@ const registrarClique = async (lojaId, tipo) => {
 
   // 2. Seus dados locais fixos
   const lojasLocais = [
-    { 
-      id: 'local-1',
-      nome: 'Marciano Coiffeur', 
-      link: '', 
-      categoria: 'Salão de Beleza',
-      regiao: 'Itupeva, SP', 
-      endereco: 'Rua Alfredo Carlos São José, 109 - Jd Europa - Itupeva/SP',
-      imagem: '/marciano.png',
-      plano: 'free',
-      whatsapp: 'https://wa.me/qr/YFF6REAHSJ2OD1',
-      instagram: 'https://www.instagram.com/marcianocoiffeur?utm_source=qr&igsh=Z3F4c2FwdXA1YTBk'
-    },
-    { 
-      id: 'local-2',
-      nome: 'Faby Brando Hair', 
-      link: '', 
-      categoria: 'Salão de Beleza',
-      regiao: 'Itupeva, SP', 
-      endereco: 'Rua Prefeito José Carlos, 514 - Ana Luiza',
-      imagem: '/fabihair.png',
-      plano: 'free',
-      whatsapp: 'https://wa.me/qr/57KQ6S4MRHCXA1',
-      instagram: 'https://www.instagram.com/fabybrandohair?utm_source=qr&igsh=MTBiNjgyazdtamZqaw=='
-    },
-    { 
-      id: 'local-3',
-      nome: 'Camomila Sabonetes Artesanais', 
-      link: 'https://catalogo-camomila.vercel.app/?ref=JUELISIA2026', 
-      categoria: 'Artesanato',
-      regiao: 'Itupeva, SP',
-      endereco: 'Vendas Online / Encomendas',
-      descricao: 'Sabonetes artesanais e fitoterápicos feitos com amor para cuidar da sua pele. Fragrâncias exclusivas e hidratação natural!',
-      imagem: '/camomila.png',
-      imagem2: '/sabonete-arruda.jpg', 
-      imagem3: '/kit-energetico.jpg', 
-      plano: 'premium'
-    },
+    
     { 
       id: 'local-4',
-      nome: 'Seu site, suacara- Soluções digitais', 
+      nome: 'Seu site, sua cara- Soluções digitais', 
       link: 'https://www.seusitesuacara.com',     
       categoria: 'Soluções Digitais',
       regiao: 'Itupeva, SP',
       endereco: 'Atendimento Online / Home Office',
       imagem: '/logoseusite.png',
-      plano: 'premium'
-    },
-  
-    { 
-      id: 'local-5',
-      nome: 'Mk Fitness Academia', 
-      link: 'https://www.mkfitnessacademia.com.br',     
-      categoria: 'Academia',
-      regiao: 'Itupeva, SP',
-      endereco: 'Av. Itália, 581 - Centro',
-      imagem: '/academia.png',
       plano: 'premium'
     }
   ];
@@ -506,32 +467,32 @@ const registrarClique = async (lojaId, tipo) => {
                       </button>
                     ) : (
                       <div className="d-flex gap-2">
-                        {loja.whatsapp && (
-                          <a 
-                            href={loja.whatsapp} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            onClick={() => registrarClique(loja.id, 'whatsapp')} // Adicione aqui
-                            className="d-flex align-items-center justify-content-center text-decoration-none text-white shadow-sm" 
-                            style={{ width: '36px', height: '36px', backgroundColor: '#25D366', borderRadius: '50%', fontSize: '1.1rem' }}
-                          >
-                            <i className="bi bi-whatsapp"></i>
-                          </a>
-                        )}
+                          {loja.whatsapp && (
+                            <a 
+                              href={montarLinkSeguro(loja.whatsapp)} // <--- AQUI
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              onClick={() => registrarClique(loja.id, 'whatsapp')}
+                              className="d-flex align-items-center justify-content-center text-decoration-none text-white shadow-sm" 
+                              style={{ width: '36px', height: '36px', backgroundColor: '#25D366', borderRadius: '50%', fontSize: '1.1rem' }}
+                            >
+                              <i className="bi bi-whatsapp"></i>
+                            </a>
+                          )}
 
-                        {loja.instagram && (
-                          <a 
-                            href={loja.instagram} 
-                            target="_blank" 
-                            rel="noopener noreferrer" 
-                            onClick={() => registrarClique(loja.id, 'instagram')} // Adicione aqui
-                            className="d-flex align-items-center justify-content-center text-decoration-none text-white shadow-sm" 
-                            style={{ width: '36px', height: '36px', background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', borderRadius: '50%', fontSize: '1.1rem' }}
-                          >
-                            <i className="bi bi-instagram"></i>
-                          </a>
-                        )}
-                      </div>
+                          {loja.instagram && (
+                            <a 
+                              href={montarLinkSeguro(loja.instagram)} // <--- AQUI
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              onClick={() => registrarClique(loja.id, 'instagram')}
+                              className="d-flex align-items-center justify-content-center text-decoration-none text-white shadow-sm" 
+                              style={{ width: '36px', height: '36px', background: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', borderRadius: '50%', fontSize: '1.1rem' }}
+                            >
+                              <i className="bi bi-instagram"></i>
+                            </a>
+                          )}
+                        </div>
                     )}
                   </div>
                 </div>
