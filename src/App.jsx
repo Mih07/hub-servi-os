@@ -71,7 +71,7 @@ const registrarClique = async (lojaId, tipo) => {
   // 2. Seus dados locais fixos
   const lojasLocais = [
     
-    { 
+   /* { 
       id: 'local-4',
       nome: 'Seu site, sua cara- Soluções digitais', 
       link: 'https://www.seusitesuacara.com',     
@@ -82,7 +82,7 @@ const registrarClique = async (lojaId, tipo) => {
       imagem2: '/cardapio.png',
       imagem3: '/site.png',
       plano: 'premium'
-    }
+    }*/
   ];
 
   const [lojas, setLojas] = useState(lojasLocais);
