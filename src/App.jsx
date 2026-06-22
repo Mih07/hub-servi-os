@@ -13,16 +13,14 @@ function App() {
   const [busca, setBusca] = useState('');
   const [categoriaSelecionada, setCategoriaSelecionada] = useState('Tudo');
   const [regiaoSelecionada, setRegiaoSelecionada] = useState('Itupeva, SP');
-  
-  // Voltamos para string vazia '' para a Tela Principal (Guia) ser a primeira a carregar!
   const [telaAtual, setTelaAtual] = useState(''); 
   const [slugLojistaAtivo, setSlugLojistaAtivo] = useState('');
-
+  const [notas, setNotas] = useState({});
+  const [hover, setHover] = useState({ lojaId: null, nota: 0 });
   // 1. Estado dos favoritos (já iniciando com o que estiver no localStorage)
   const [favoritos, setFavoritos] = useState(() => {
   const salvos = localStorage.getItem('meusFavoritos');
-  const refsLojas = {};
-    return salvos ? JSON.parse(salvos) : [];
+      return salvos ? JSON.parse(salvos) : [];
   });
 
   // 2. Função para alternar o status do favorito
@@ -45,6 +43,19 @@ const registrarClique = async (lojaId, tipo) => {
     console.log(`Clique registrado: ${tipo} na loja ${lojaId}`);
   } catch (err) {
     console.error("Erro ao registrar estatística:", err.message);
+  }
+};
+
+const registrarAvaliacao = async (lojaId, nota) => {
+  const { error } = await supabase
+    .rpc('adicionar_avaliacao', { p_loja_id: lojaId, p_nova_nota: nota });
+
+  if (error) {
+    console.error("Erro ao avaliar:", error);
+  } else {
+    alert("Avaliação registrada com sucesso!");
+    // Opcional: recarregar a lista para exibir a nota atualizada
+    // carregarLojasDoBanco(); 
   }
 };
 
@@ -420,16 +431,31 @@ const registrarClique = async (lojaId, tipo) => {
                   <h3 className="h5 fw-bold text-dark mb-1">{loja.nome}</h3>
                   
                  
-                  <div className="mb-2">
-                    {[1, 2, 3, 4, 5].map((estrela) => (
-                      <i 
-                        key={estrela} 
-                        className={`bi ${estrela <= (loja.nota || 5) ? 'bi-star-fill text-warning' : 'bi-star text-muted'}`}
-                        style={{ fontSize: '0.75rem', marginRight: '2px' }}
-                      ></i>
-                    ))}
-                    <span className="text-muted small ms-1">({loja.avaliacoes || 0})</span>
-                  </div>
+        <div className="mb-2">
+            {[1, 2, 3, 4, 5].map((estrela) => (
+              <i 
+                key={estrela} 
+                className={`bi ${estrela <= ((hover.lojaId === loja.id ? hover.nota : 0) || notas[loja.id] || 0) ? 'bi-star-fill text-warning' : 'bi-star text-muted'}`}
+                style={{ 
+                  fontSize: '1.2rem', 
+                  marginRight: '4px', 
+                  cursor: 'pointer',
+                  transition: 'color 0.2s'
+                }}
+                onClick={() => {
+                  // 1. Atualiza o estado visual instantaneamente para o usuário
+                  setNotas(prev => ({ ...prev, [loja.id]: estrela }));
+                  // 2. Chama a função que envia para o Supabase
+                  registrarAvaliacao(loja.id, estrela);
+                }}
+                onMouseEnter={() => setHover({ lojaId: loja.id, nota: estrela })}
+                onMouseLeave={() => setHover({ lojaId: null, nota: 0 })}
+              ></i>
+            ))}
+            <span className="text-muted small ms-1">
+              {notas[loja.id] ? `(${notas[loja.id]} estrelas)` : '(Avalie)'}
+            </span>
+          </div>
 
                   <p className="text-muted small mb-2">{loja.categoria} • {loja.regiao}</p>
                   
