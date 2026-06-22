@@ -5,8 +5,10 @@ function Cadastro({ setTelaAtual }) {
   const [formData, setFormData] = useState({
     nome: '',
     categoria: '',
+    outraCategoria: '',
     regiao: '', 
     endereco: '',
+    bairro: '',
     descricao: '', // Agora é geral para todo mundo!
     plano: 'free',
     link: '',
@@ -29,7 +31,7 @@ function Cadastro({ setTelaAtual }) {
     if (file) setFile(file);
   };
 
-    const uploadImage = async (file) => {
+  const uploadImage = async (file) => {
    const fileName = `${Date.now()}-${file.name.replace(/\s/g, '-')}`; 
 
     const { data, error } = await supabase.storage
@@ -69,15 +71,17 @@ const handleSubmit = async (e) => {
     const slugGerado = gerarSlug(formData.nome);
 
     // 3. SALVAR NO SUPABASE (Incluindo o slug!)
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('servicos')
       .insert([
         {
           nome: formData.nome,
           slug: slugGerado, // <--- ADICIONE ESTA LINHA
-          categoria: formData.categoria,
+          categoria: formData.categoria === 'Outra'
+              ? formData.outraCategoria: formData.categoria, 
           regiao: formData.regiao,
           endereco: formData.endereco,
+          bairro: formData.bairro,
           plano: formData.plano,
           descricao: formData.descricao,
           link: (formData.plano === 'premium' || formData.plano === 'gold') ? formData.link : null,
@@ -128,44 +132,78 @@ const handleSubmit = async (e) => {
 
             {/* 🛠️ CATEGORIA MUDADA PARA SELECT SEGURO */}
             <div className="col-md-6">
-              <label className="form-label fw-bold small text-uppercase text-secondary">Categoria</label>
-              <select 
-                name="categoria" 
-                className="form-select form-control-lg rounded-4 shadow-sm" 
-                required 
-                value={formData.categoria} 
-                onChange={handleChange}
-              >
-                <option value="">Selecione uma categoria...</option>
-                {['Academia', 'Artesanato', 'Comida', 'Doces', 'Esmalteria', 'Pet', 'Salão de Beleza', 'Saúde', 'Soluções Digitais'].map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
+                <label className="form-label fw-bold small text-uppercase text-secondary">
+                  Categoria
+                </label>
+
+                <select
+                  name="categoria"
+                  className="form-select form-control-lg rounded-4 shadow-sm"
+                  value={formData.categoria}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="">Selecione uma categoria...</option>
+                  <option value="Academia">Academia</option>
+                  <option value="Artesanato">Artesanato</option>
+                  <option value="Comida">Comida</option>
+                  <option value="Cosméticos">Cosméticos</option>
+                  <option value="Doces">Doces</option>
+                  <option value="Esmalteria">Esmalteria</option>
+                  <option value="Pet">Pet</option>
+                  <option value="Salão de Beleza">Salão de Beleza</option>
+                  <option value="Saúde">Saúde</option>
+                  <option value="Soluções Digitais">Soluções Digitais</option>
+                  <option value="Outra">Outra...</option>
+                </select>
+
+                {formData.categoria === 'Outra' && (
+                  <input
+                    type="text"
+                    name="outraCategoria"
+                    className="form-control mt-2 rounded-4 shadow-sm"
+                    placeholder="Digite sua categoria"
+                    value={formData.outraCategoria}
+                    onChange={handleChange}
+                    required
+                  />
+                )}
+              </div>
 
             {/* 🛠️ CIDADE / REGIÃO MUDADA PARA SELECT SEGURO */}
             <div className="col-md-6">
-              <label className="form-label fw-bold small text-uppercase text-secondary">Cidade / Região</label>
-              <select 
-                name="regiao" 
-                className="form-select form-control-lg rounded-4 shadow-sm" 
-                required 
-                value={formData.regiao} 
-                onChange={handleChange}
-              >
-                <option value="">Selecione a cidade...</option>
-                <option value="Itupeva, SP">Itupeva, SP</option>
-                <option value="Jundiaí, SP">Jundiaí, SP</option>
-                <option value="Louveira, SP">Louveira, SP</option>
-                <option value="Cabreúva, SP">Cabreúva, SP</option>
-                <option value="Indaiatuba, SP">Indaiatuba, SP</option>
-              </select>
-            </div>
+                <label className="form-label fw-bold small text-uppercase text-secondary">
+                  Cidade / Região
+                </label>
+
+                <input
+                  type="text"
+                  name="regiao"
+                  className="form-control form-control-lg rounded-4 shadow-sm"
+                  placeholder="Ex: Itatiba, SP"
+                  value={formData.regiao}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
 
             <div className="col-12">
               <label className="form-label fw-bold small text-uppercase text-secondary">Endereço Completo</label>
-              <input type="text" name="endereco" className="form-control form-control-lg rounded-4 shadow-sm" placeholder="Rua, Número e Bairro" required value={formData.endereco} onChange={handleChange} />
+              <input type="text" name="endereco" className="form-control form-control-lg rounded-4 shadow-sm" placeholder="Rua, Número" required value={formData.endereco} onChange={handleChange} />
             </div>
+
+            <div className="col-12">
+                <label className="form-label fw-bold small text-uppercase text-secondary">Bairro</label>
+                <input 
+                  type="text" 
+                  name="bairro" 
+                  className="form-control form-control-lg rounded-4 shadow-sm" 
+                  placeholder="Ex: Centro, Vila Nova..." 
+                  required 
+                  value={formData.bairro} 
+                  onChange={handleChange} 
+                />
+              </div>
 
             <div className="col-12 mt-4">
               <label className="form-label fw-bold small text-uppercase text-secondary">Breve descrição dos seus serviços (Até 200 letras)</label>

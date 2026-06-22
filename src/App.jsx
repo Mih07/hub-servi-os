@@ -217,7 +217,6 @@ const registrarClique = async (lojaId, tipo) => {
                         <option value="Jundiaí, SP">Jundiaí, SP</option>
                         <option value="Louveira, SP">Louveira, SP</option>
                         <option value="Cabreúva, SP">Cabreúva, SP</option>
-                        <option value="Indaiatuba, SP">Indaiatuba, SP</option>
                       </select>
                     </div>
                   </div>
