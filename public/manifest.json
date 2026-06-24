@@ -4,13 +4,13 @@
   "description": "Guia de Serviços e Comércio Local",
   "icons": [
     {
-      "src": "/logoseusite.png",
+      "src": "/logo-hub.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/logoseusite.png",
+      "src": "/logo-hub.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

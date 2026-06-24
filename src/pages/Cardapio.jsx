@@ -7,6 +7,7 @@ function Cardapio({ slugLojista, setTelaAtual }) {
   const [produtos, setProdutos] = useState([]);
   const [carrinho, setCarrinho] = useState([]);
   const [carregando, setCarregando] = useState(true);
+  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
   const isGold = lojista?.plano === 'gold';
 
   // Estados para o Checkout Avançado
@@ -151,6 +152,8 @@ function Cardapio({ slugLojista, setTelaAtual }) {
       textoPedido += `• Levar troco para: R$ ${parseFloat(trocoPara).toFixed(2)}\n`;
     }
 
+    textoPedido += `\n---------------------------------------\n`;
+    textoPedido += `✅ *Pedido realizado via Hub Serviços*`;
     textoPedido += `\n_Olá! Acabei de enviar o meu pedido pelo Hub Serviços. Fico no aguardo da confirmação!_`;
 
     const numeroWhats = lojista.whatsapp ? lojista.whatsapp.replace(/\D/g, '') : '';
@@ -223,17 +226,56 @@ if (lojista.plano !== 'gold') {
       </div>
 
       {/* Cabeçalho da Loja */}
-      <header className="text-center pb-3 border-bottom mb-4">
-        <h1 className="fw-bold h3 mb-1" style={{ color: '#333' }}>{lojista.nome_comercio}</h1>
-        <span className="badge rounded-pill" style={{ backgroundColor: '#fff0f6', color: '#d63384', border: '1px solid #d63384', padding: '6px 14px' }}>
-          🛒 Pedidos via WhatsApp
-        </span>
-      </header>
+      <header className="text-center pb-4 border-bottom mb-4 bg-white">
+          {/* Logo da Loja */}
+          {lojista.logo_url && (
+            <div className="mb-3">
+              <img 
+                src={lojista.logo_url} 
+                alt={lojista.nome_comercio} 
+                className="rounded-circle shadow-sm border border-light" 
+                style={{ width: '100px', height: '100px', objectFit: 'cover' }} 
+              />
+            </div>
+          )}
+          {/* Status de Loja */}
+          
+          {/* Nome do Comércio */}
+          <h1 className="fw-bold h2 mb-1" style={{ color: '#2d3436' }}>{lojista.nome_comercio}</h1>
+          
+          {/* Badge de Verificação Hub */}
+          <div className="mb-3">
+            <span className="badge rounded-pill" style={{ backgroundColor: '#e3f2fd', color: '#1976d2', fontSize: '0.75rem' }}>
+              ✓ Loja oficial Hub Serviços
+            </span>
+          </div>
 
-      {/* FLUXO 1: LISTA DE PRODUTOS DO CARDÁPIO */}
+          {/* Informações de Contato/Localização */}
+          <div className="d-flex flex-column align-items-center gap-1 text-muted small">
+            {lojista.endereco_loja && (
+              <div className="d-flex align-items-center">
+                <i className="bi bi-geo-alt-fill me-1"></i>
+                <span>{lojista.endereco_loja}</span>
+              </div>
+            )}
+            
+            {lojista.horario_funcionamento && (
+              <div className="d-flex align-items-center">
+                <i className="bi bi-clock-fill me-1"></i>
+                <span>{lojista.horario_funcionamento}</span>
+              </div>
+            )}
+            <div className="my-2">
+            <span className={`badge rounded-pill ${lojista.esta_aberto ? 'bg-success' : 'bg-danger'}`}>
+              {lojista.esta_aberto ? '🟢 Aberto Agora' : '🔴 Loja Fechada'}
+            </span>
+          </div>
+          </div>
+        </header>
+
+
       {!verCheckout ? (
-        <main className="pb-5 mb-5">
-          {categoriesUnicas.length === 0 ? (
+        <main className="pb-5 mb-5">{categoriesUnicas.length === 0 ? (
             <div className="text-center py-4 text-muted">
               <p>Nenhum produto cadastrado para este lojista ainda. 📋</p>
             </div>
@@ -246,43 +288,68 @@ if (lojista.plano !== 'gold') {
 
                 <div className="d-flex flex-column gap-3">
                   {produtos.filter(p => p.categoria === categoria).map(produto => {
-                    const itemNoCarrinho = carrinho.find(item => item.id === produto.id);
-                    
-                    return (
-                      <div key={produto.id} className="card border border-light-subtle shadow-sm p-3 d-flex flex-row align-items-center justify-content-between" style={{ borderRadius: '15px', backgroundColor: '#fdfdfd' }}>
-                        <div className="flex-grow-1 me-2 text-start">
-                          <h3 className="h6 fw-bold mb-1 text-dark" style={{ fontSize: '0.95rem' }}>{produto.nome}</h3>
-                          <p className="fw-bold mb-0" style={{ color: '#d63384', fontSize: '0.9rem' }}>R$ {produto.preco ? produto.preco.toFixed(2) : '0.00'}</p>
-                        </div>
+                  const itemNoCarrinho = carrinho.find(item => item.id === produto.id);
 
-                        <div className="d-flex align-items-center gap-2">
-                          {produto.imagem_url && (
-                            <img src={produto.imagem_url} alt={produto.nome} className="rounded-3" style={{ width: '65px', height: '65px', objectFit: 'cover' }} />
+                  return (
+                    <div key={produto.id} className="card border border-light-subtle shadow-sm p-3 d-flex flex-row align-items-center justify-content-between" style={{ borderRadius: '15px', backgroundColor: '#fdfdfd' }}>
+                      
+                      {/* Informações do Produto (Clique abre o Modal) */}
+                      <div 
+                        className="flex-grow-1 me-2 text-start" 
+                        onClick={() => setProdutoSelecionado(produto)} 
+                        style={{ cursor: 'pointer' }}
+                      >
+                        <h3 className="h6 fw-bold mb-1 text-dark" style={{ fontSize: '0.95rem' }}>{produto.nome}</h3>
+                        
+                        {produto.descricao && (
+                          <p className="text-muted mb-1" style={{ fontSize: '0.9rem', lineHeight: '1.4', fontWeight: '500' }}>
+                            {produto.descricao}
+                          </p>
+                        )}
+                        
+                        <p className="fw-bold mb-0" style={{ color: '#d63384', fontSize: '0.9rem' }}>
+                          R$ {typeof produto.preco === 'number' ? produto.preco.toFixed(2) : parseFloat(produto.preco || 0).toFixed(2)}
+                        </p>
+                      </div>
+
+                      {/* Imagem e Botão */}
+                      <div className="d-flex align-items-center gap-2">
+                        {produto.imagem_url && (
+                          <img 
+                            src={produto.imagem_url} 
+                            alt={produto.nome} 
+                            className="rounded-3" 
+                            style={{ width: '65px', height: '65px', objectFit: 'cover', cursor: 'pointer' }}
+                            onClick={() => setProdutoSelecionado(produto)}
+                          />
+                        )}
+                        
+                        <div className="d-flex align-items-center bg-light rounded-pill p-1 border">
+                          {itemNoCarrinho ? (
+                            <>
+                              <button onClick={() => removerDoCarrinho(produto.id)} className="btn btn-sm btn-light rounded-circle fw-bold lh-1 p-1 d-flex align-items-center justify-content-center" style={{ width: '28px', height: '28px' }}>-</button>
+                              <span className="px-2 fw-bold small" style={{ minWidth: '20px', textAlign: 'center' }}>{itemNoCarrinho.quantidade}</span>
+                              <button onClick={() => adicionarAoCarrinho(produto)} className="btn btn-sm btn-light rounded-circle fw-bold lh-1 p-1 d-flex align-items-center justify-content-center" style={{ width: '28px', height: '28px' }}>+</button>
+                            </>
+                          ) : (
+                            <button onClick={() => adicionarAoCarrinho(produto)} className="btn btn-sm btn-primary rounded-pill px-3 fw-bold small" style={{ backgroundColor: '#d63384', borderColor: '#d63384', fontSize: '0.8rem' }}>
+                              Adicionar
+                            </button>
                           )}
-                          
-                          <div className="d-flex align-items-center bg-light rounded-pill p-1 border">
-                            {itemNoCarrinho ? (
-                              <>
-                                <button onClick={() => removerDoCarrinho(produto.id)} className="btn btn-sm btn-light rounded-circle fw-bold lh-1 p-1 d-flex align-items-center justify-content-center" style={{ width: '24px', height: '24px' }}>-</button>
-                                <span className="px-2 fw-bold small" style={{ minWidth: '20px', textAlign: 'center' }}>{itemNoCarrinho.quantidade}</span>
-                                <button onClick={() => adicionarAoCarrinho(produto)} className="btn btn-sm btn-light rounded-circle fw-bold lh-1 p-1 d-flex align-items-center justify-content-center" style={{ width: '24px', height: '24px' }}>+</button>
-                              </>
-                            ) : (
-                              <button onClick={() => adicionarAoCarrinho(produto)} className="btn btn-sm btn-primary rounded-pill px-3 fw-bold small" style={{ backgroundColor: '#d63384', borderColor: '#d63384', fontSize: '0.8rem' }}>
-                                Adicionar
-                              </button>
-                            )}
-                          </div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+
+                })}
               </div>
+            </div>
             ))
           )}
         </main>
+        
       ) : (
+
         /* FLUXO 2: TELA DE CONFERÊNCIA E FORMULÁRIO DE CHECKOUT */
         <main className="pb-5 mb-5 text-start">
           <h2 className="h5 fw-bold mb-3 text-dark">📋 Confirme seu Pedido</h2>
@@ -432,7 +499,7 @@ if (lojista.plano !== 'gold') {
             </button>
           </form>
         </main>
-      )}
+      )} 
 
       {/* BARRA INFERIOR (Apenas visível se houver itens e não estiver no checkout) */}
       {carrinho.length > 0 && !verCheckout && (
@@ -447,7 +514,33 @@ if (lojista.plano !== 'gold') {
           </button>
         </div>
       )}
-
+{/* MODAL DE DETALHES */}
+{produtoSelecionado && (
+  <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }}>
+    <div className="modal-dialog modal-dialog-centered">
+      <div className="modal-content rounded-4 border-0">
+        <div className="modal-body p-4 text-center">
+          <button className="btn-close position-absolute top-0 end-0 m-3" onClick={() => setProdutoSelecionado(null)}></button>
+          
+          {produtoSelecionado.imagem_url && (
+            <img src={produtoSelecionado.imagem_url} className="img-fluid rounded-4 mb-3 shadow" alt={produtoSelecionado.nome} />
+          )}
+          
+          <h2 className="fw-bold">{produtoSelecionado.nome}</h2>
+          <p className="text-muted fs-5">{produtoSelecionado.descricao}</p>
+          <p className="h3 text-success fw-bold">R$ {parseFloat(produtoSelecionado.preco).toFixed(2)}</p>
+          
+          <button className="btn btn-primary w-100 rounded-pill py-2 mt-3" onClick={() => {
+            adicionarAoCarrinho(produtoSelecionado);
+            setProdutoSelecionado(null);
+          }}>
+            Adicionar ao Pedido
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
