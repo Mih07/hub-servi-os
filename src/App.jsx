@@ -459,6 +459,17 @@ const registrarAvaliacao = async (lojaId, nota) => {
           </div>
 
                   <p className="text-muted small mb-2">{loja.categoria} • {loja.regiao}</p>
+                  {loja.endereco && (
+                    <p className="text-muted small mb-2">
+                      <i className="bi bi-geo-alt-fill me-1"></i> {loja.endereco}
+                    </p>
+                  )}
+
+                  {loja.bairro && (
+                    <p className="text-muted small mb-2">
+                      <i className="bi bi-house-door-fill me-1"></i> {loja.bairro}
+                    </p>
+                  )}
                   
                   {loja.descricao && (
                     <p className="text-secondary small bg-light p-2 rounded-3 mb-2 border-start border-3" style={{ fontStyle: 'italic', fontSize: '0.85rem', lineHeight: '1.3', borderLeftColor: '#d63384' }}>
