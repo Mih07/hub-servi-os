@@ -7,7 +7,7 @@ const Navbar = () => {
       <div className="container">
         
         {/* Link principal para a Home */}
-        <Link className="navbar-brand fw-bold" to="/" style={{ color: '#5d4037' }} title="Página Inicial Hub Serviços Itupeva">
+        <Link className="navbar-brand fw-bold" to="/" style={{ fontSize: '2.25rem', color: '#5d4037' }} title="Página Inicial Hub Serviços Itupeva">
           <span style={{ color: '#d63384' }}>Hub</span> Serviços
         </Link>
 

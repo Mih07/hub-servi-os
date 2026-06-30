@@ -3,11 +3,29 @@
 /* 1. Estilo para o fundo da página (opcional) */
 body {
   background-color: #f8f9fa; /* Um cinza bem clarinho estilo Apple/iFood */
+  margin: 0;
+  padding: 0;
 }
 html {
   scroll-behavior: smooth;
 }
 
+.navbar {
+  /* O gradiente vai do verde -> amarelo -> azul */
+  background: linear-gradient(90deg, #009c3b 0%, #ffdf00 50%, #002776 100%);
+  padding: 1rem;
+  color: white; /* Para o texto ficar visível sobre o azul e verde */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  
+}
+footer {
+  /* O gradiente vai do verde -> amarelo -> azul */
+  background: linear-gradient(90deg, #009c3b 0%, #ffdf00 50%, #002776 100%);
+    
+}
 /* nav */
 .skip-link {
   position: absolute;
