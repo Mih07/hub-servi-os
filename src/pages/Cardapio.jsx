@@ -2,7 +2,10 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
-function Cardapio({ slugLojista, setTelaAtual }) {
+function Cardapio() {
+  const { slug } = useParams();
+  const navigate = useNavigate();
+
   const [lojista, setLojista] = useState(null);
   const [produtos, setProdutos] = useState([]);
   const [carrinho, setCarrinho] = useState([]);
@@ -37,7 +40,7 @@ function Cardapio({ slugLojista, setTelaAtual }) {
     const { data: dadosLojista, error: errLojista } = await supabase
       .from('servicos') 
       .select('*')
-      .eq('slug', slugLojista)
+      .eq('slug', slug) 
       .order('id', { ascending: false }) // Pega o último cadastro feito (que deve ser o mais atualizado)
       .limit(1) // Garante que virá apenas uma linha, mesmo que existam várias
       .maybeSingle(); // O maybeSingle é mais seguro que o .single()
@@ -49,7 +52,7 @@ function Cardapio({ slugLojista, setTelaAtual }) {
     const { data: dadosProdutos, error: errProdutos } = await supabase
       .from('produtos')
       .select('*')
-      .eq('slug_lojista', slugLojista); // Mantém o elo pelo slug
+      .eq('slug_lojista', slug); // Mantém o elo pelo slug
 
     if (errProdutos) throw errProdutos;
     setProdutos(dadosProdutos || []);
@@ -61,12 +64,12 @@ function Cardapio({ slugLojista, setTelaAtual }) {
   }
 }
 
-    if (slugLojista) {
+    if (slug) {
       carregarDados();
     } else {
       setCarregando(false);
     }
-  }, [slugLojista]);
+  }, [slug]);
 
   // 2. Funções de controle do Carrinho de Compras
   const adicionarAoCarrinho = (produto) => {
@@ -182,7 +185,7 @@ if (!lojista) {
       <button
         className="btn btn-primary rounded-pill mt-2 px-4"
         style={{ backgroundColor: '#d63384', borderColor: '#d63384' }}
-        onClick={() => setTelaAtual('')}
+        onClick={() => navigate('/')}
       >
         Voltar
       </button>
@@ -201,7 +204,7 @@ if (lojista.plano !== 'gold') {
       <button
         className="btn btn-primary rounded-pill mt-2 px-4"
         style={{ backgroundColor: '#d63384', borderColor: '#d63384' }}
-        onClick={() => setTelaAtual('')}
+        onClick={() => navigate('/')}
       >
         Voltar
       </button>
@@ -218,7 +221,7 @@ if (lojista.plano !== 'gold') {
           if (verCheckout) {
             setVerCheckout(false);
           } else {
-            setTelaAtual('');
+            navigate('/');
           }
         }}>
           ⬅ {verCheckout ? 'Voltar para o Menu' : 'Voltar para o Hub'}

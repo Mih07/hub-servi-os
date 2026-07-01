@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
+import { Navigate } from 'react-router-dom';
 
-function Cadastro({ setTelaAtual }) {
+function Cadastro() {
   const [formData, setFormData] = useState({
     nome: '',
     categoria: '',
@@ -96,7 +97,7 @@ const handleSubmit = async (e) => {
     if (error) throw error;
 
     alert(`Sucesso! A loja "${formData.nome}" foi cadastrada.`);
-    setTelaAtual('');
+    Navigate('/');
 
   } catch (error) {
     console.error('Erro ao cadastrar no Supabase:', error.message);
@@ -116,7 +117,7 @@ const handleSubmit = async (e) => {
         </div>
         
         {/* Ajustado para '' no clique do botão Sair */}
-        <button className="btn btn-light rounded-pill px-4 shadow-sm border" onClick={() => setTelaAtual('')}>
+        <button className="btn btn-light rounded-pill px-4 shadow-sm border" onClick={() => Navigate('/')}>
           <i className="bi bi-x-lg me-2"></i>Sair
         </button>
       </div>
