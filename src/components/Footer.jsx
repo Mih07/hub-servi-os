@@ -4,7 +4,10 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer id="contato" className="bg-white border-top mt-5">
+    <footer id="contato" className="bg-white border-top mt-5"
+    style={{
+        background: 'var(--gradiente-principal)'
+      }}>
       <div className="container py-4"> {/* Diminuí o padding de py-5 para py-4 */}
         <div className="row justify-content-center text-center g-4">
           

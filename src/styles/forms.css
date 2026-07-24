@@ -1,0 +1,22 @@
+.form-label {
+  color: var(--cor-texto);
+}
+
+.form-control,
+.form-select {
+  min-height: 52px;
+  border-color: var(--cor-borda);
+  border-radius: var(--raio-pequeno);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--cor-borda-foco);
+  box-shadow: 0 0 0 0.25rem rgba(217, 108, 199, 0.16);
+}
+
+.input-group-text {
+  border-color: var(--cor-borda);
+  color: var(--cor-texto-secundario);
+  background-color: var(--cor-superficie);
+}

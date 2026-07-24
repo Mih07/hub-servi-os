@@ -183,12 +183,12 @@ export default function Home() {
                         />
                       </div>
                       <h1 className="fw-bold mb-2" style={{ color: '#5d4037', fontSize: '1.9rem', letterSpacing: '-1.0px', }}>
-                        Guia de Serviços e Comércio Local | <span className="fw-bolder ms-2" style={{color: '#d63384', fontWeight: 900}}>Hub Serviços</span>
+                        Serviços, comércios e negócios da sua região | <span className="fw-bolder ms-2" style={{color: '#d63384', fontWeight: 900}}>Hub Serviços</span>
                       </h1>
                     </div>
                     <p className="text-muted mt-4" style={{ maxWidth: '450px', fontSize: '1.05rem' }}>
-                        Encontre os melhores profissionais e lojas da região. 
-                        Clique no banner para acessar <strong>catálogos, cardápios e contatos diretos.</strong>
+                        Encontre serviços, comércios e negócios da sua região. 
+                        Clique no banner para acessar <strong>catálogos, cardápios e contatos diretos </strong>em um só lugar.
                     </p>
   
                     <div className="col-lg-4 text-lg-end mt-3 mt-lg-0">
@@ -288,14 +288,14 @@ export default function Home() {
   
               <div className="container px-3 mb-4">
                 <div className="rounded-4 p-4 text-center border-0 shadow-sm" style={{ backgroundColor: '#fff0f6', border: '1px dashed #d63384' }}>
-                  <h4 className="fw-bold text-dark mb-2">Sua empresa ainda não está no Guia?</h4>
-                  <p className="text-muted mb-3">Escolha entre nosso <strong>Plano Gratuito</strong> ou potencialize sua marca com o <strong>Plano Premium</strong>!</p>
+                  <h4 className="fw-bold text-dark mb-2">Sua empresa ainda não está no <strong>HubServiços?</strong></h4>
+                  <p className="text-muted mb-3">Escolha entre nosso <strong>Plano Gratuito</strong> ou potencialize sua marca com o <strong>Plano Premium ou Gold</strong>!</p>
                   <button 
                     onClick={() => navigate('/cadastro')} 
                     className="btn px-4 py-2 rounded-pill fw-bold border-0 shadow-sm" 
                     style={{ backgroundColor: '#d63384', color: '#fff' }}
                   >
-                    Quero Anunciar Grátis, Premium ou Gold
+                    Quero cadastrar minha empresa
                   </button>
                   <small className="d-block text-muted mt-2" style={{ fontSize: '0.8rem' }}>
                     *Os cadastros passam por análise de conteúdo e são liberados em até 24 hours pela administração.

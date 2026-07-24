@@ -3,7 +3,11 @@ import { Link } from 'react-router-dom'; // 1. Importação necessária
 
 const Navbar = () => {
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3">
+    <nav className="navbar navbar-expand-lg navbar-light bg-white sticky-top shadow-sm py-3"
+    style={{
+        background: 'var(--gradiente-principal)'
+      }}>
+        
       <div className="container">
         
         {/* Link principal para a Home */}
@@ -27,6 +31,12 @@ const Navbar = () => {
               <a className="nav-link px-3 fw-medium" href="#contato">Contato</a>
             </li>
 
+            <li className="nav-item">
+              <Link className="nav-link px-3 fw-medium" to="/login-lojista" style={{ color: '#5d4037' }}>
+              <i className="bi bi-person-circle me-1"></i>Área do Lojista
+              </Link>
+            </li>
+    
             <li className="nav-item ms-lg-3">
               <a 
                 href="https://wa.me/5511971128269?text=Olá!%20Gostaria%20de%20anunciar%20minha%20empresa%20no%20Hub%20Serviços%20(Itupeva%20e%20Região)." 

@@ -1,0 +1,176 @@
+.login-lojista-pagina {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(217, 108, 199, 0.14),
+      transparent 35%
+    ),
+    var(--cor-fundo);
+}
+
+.login-lojista-container {
+  width: 100%;
+  max-width: 1120px;
+  min-height: 650px;
+  margin: 0 auto;
+  overflow: hidden;
+
+  background-color: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-grande);
+  box-shadow: var(--sombra-media);
+}
+
+.login-lojista-apresentacao {
+  min-height: 650px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  background: var(--gradiente-principal);
+  color: var(--cor-texto);
+}
+
+.login-lojista-area-formulario {
+  min-height: 650px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--cor-superficie);
+}
+
+.login-lojista-card {
+  width: 100%;
+  max-width: 440px;
+}
+
+.login-lojista-marca {
+  position: relative;
+  z-index: 2;
+  display: inline-block;
+
+  color: #765147;
+  font-size: 2rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.login-lojista-marca:hover {
+  color: #765147;
+}
+
+.login-lojista-marca span {
+  color: #d92d87;
+  font-size: 2.5rem;
+  font-weight: 900;
+}
+
+.login-lojista-etiqueta {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 50px;
+
+  background-color: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+
+  color: var(--cor-texto);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.login-lojista-apresentacao-conteudo h1 {
+  color: var(--cor-texto);
+  font-size: clamp(2.1rem, 4vw, 3.4rem);
+  font-weight: 800;
+}
+
+.login-lojista-texto {
+  color: var(--cor-texto-secundario);
+  line-height: 1.7;
+}
+
+.login-lojista-beneficio-icone {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+
+  border-radius: var(--raio-pequeno);
+  background-color: rgba(255, 255, 255, 0.3);
+  color: var(--cor-texto);
+}
+
+.login-lojista-icone {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+
+  border-radius: 22px;
+  background-color: #fff0f7;
+  color: var(--cor-primaria);
+  font-size: 2.5rem;
+}
+
+.login-lojista-ajuda {
+  background-color: #faf7f9;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-medio);
+}
+
+.login-lojista-voltar {
+  color: var(--cor-texto-secundario);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.login-lojista-voltar:hover {
+  color: var(--cor-primaria);
+}
+
+@media (max-width: 991.98px) {
+  .login-lojista-container {
+    max-width: 650px;
+    min-height: auto;
+  }
+
+  .login-lojista-apresentacao,
+  .login-lojista-area-formulario {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .login-lojista-pagina {
+    align-items: stretch;
+    padding: 0 !important;
+  }
+
+  .login-lojista-pagina > .container {
+    max-width: none;
+    padding: 0;
+  }
+
+  .login-lojista-container {
+    min-height: 100vh;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .login-lojista-apresentacao {
+    padding: 28px 24px 36px !important;
+    border-radius: 0 0 28px 28px;
+  }
+
+  .login-lojista-area-formulario {
+    padding: 36px 24px !important;
+  }
+}

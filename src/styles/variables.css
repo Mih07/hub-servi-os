@@ -1,0 +1,106 @@
+:root {
+
+  /* ==============================
+     IDENTIDADE DA MARCA
+  ============================== */
+
+  --cor-primaria: #d96cc7;
+  --cor-primaria-hover: #c052b2;
+
+  --cor-secundaria: #f4a6c8;
+  --cor-secundaria-hover: #e889b4;
+
+  --cor-destaque: #f7dd7e;
+
+  --cor-texto: #765147;
+  --cor-texto-secundario: #8b6b63;
+  --cor-texto-claro: #ffffff;
+
+  --cor-fundo: #fff8f5;
+  --cor-superficie: #ffffff;
+
+  --cor-borda: #edd6df;
+  --cor-borda-foco: #d96cc7;
+
+  --cor-sucesso: #25d366;
+  --cor-aviso: #ffc107;
+  --cor-erro: #dc3545;
+  --cor-info: #0dcaf0;
+
+  --gradiente-principal: linear-gradient(
+    135deg,
+    #fff3a8 0%,
+    #ffd7c7 40%,
+    #f5acd9 70%,
+    #e88ee5 100%
+  );
+
+  --gradiente-botao: linear-gradient(
+    135deg,
+    #d96cc7,
+    #b85fce
+  );
+
+  --cor-free: #6c757d;
+  --cor-premium: #5b76e8;
+  --cor-gold: #f5a623;
+
+  --raio-pequeno: 10px;
+  --raio-medio: 18px;
+  --raio-grande: 30px;
+
+  --sombra-pequena: 0 6px 18px rgba(118,81,71,.08);
+  --sombra-media: 0 15px 40px rgba(118,81,71,.14);
+}
+
+[data-tema="copa"] {
+  --cor-primaria: #009c3b;
+  --cor-primaria-hover: #007f30;
+
+  --cor-secundaria: #ffdf00;
+  --cor-secundaria-hover: #e5c900;
+
+  --cor-destaque: #002776;
+
+  --cor-texto: #123528;
+  --cor-texto-secundario: #285944;
+
+  --cor-fundo: #f4fff7;
+  --cor-superficie: #ffffff;
+
+  --cor-borda: #bde8cd;
+  --cor-borda-foco: #009c3b;
+
+  --gradiente-principal: linear-gradient(
+    135deg,
+    #00a33d 0%,
+    #27a837 38%,
+    #94c414 70%,
+    #ffdf00 100%
+  );
+
+  --gradiente-botao: linear-gradient(
+    135deg,
+    #009c3b,
+    #007f30
+  );
+}
+
+[data-tema="natal"] {
+  --cor-primaria: #b71c1c;
+  --cor-primaria-hover: #8e1515;
+  --cor-secundaria: #1b5e20;
+  --cor-destaque: #d4af37;
+
+  --gradiente-principal: linear-gradient(
+    135deg,
+    #8e1515,
+    #1b5e20
+  );
+
+  --gradiente-botao: linear-gradient(
+    135deg,
+    #b71c1c,
+    #8e1515
+  );
+}

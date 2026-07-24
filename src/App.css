@@ -21,6 +21,7 @@ html {
   margin-bottom: 20px;
   
 }
+
 footer {
   /* O gradiente vai do verde -> amarelo -> azul */
   background: linear-gradient(90deg, #009c3b 0%, #ffdf00 50%, #002776 100%);
@@ -49,6 +50,7 @@ footer {
   outline-offset: 3px;
   border-radius: 8px;
 }
+
 /* Remove o contorno azul padrão e adiciona o personalizado em todos os links e botões */
 a:focus-visible, 
 button:focus-visible,

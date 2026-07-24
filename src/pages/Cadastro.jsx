@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+
 
 function Cadastro() {
   const [formData, setFormData] = useState({
@@ -16,7 +17,7 @@ function Cadastro() {
     whatsapp: '',
     instagram: ''
   });
-
+  const navigate = useNavigate();
   const [logoFile, setLogoFile] = useState(null);
   const [fotoExtra1, setFotoExtra1] = useState(null);
   const [fotoExtra2, setFotoExtra2] = useState(null);
@@ -97,7 +98,7 @@ const handleSubmit = async (e) => {
     if (error) throw error;
 
     alert(`Sucesso! A loja "${formData.nome}" foi cadastrada.`);
-    Navigate('/');
+    navigate('/');
 
   } catch (error) {
     console.error('Erro ao cadastrar no Supabase:', error.message);
@@ -113,11 +114,11 @@ const handleSubmit = async (e) => {
           <h2 className="fw-bold" style={{ color: '#5d4037', letterSpacing: '-1px' }}>
             Novo Cadastro | <span style={{ color: '#d63384' }}>Hub Serviços</span>
           </h2>
-          <p className="text-muted">Escolha como quer exibir sua empresa para a região.</p>
+          <p className="text-muted">Escolha como sua empresa quer participar do Hub Serviços.</p>
         </div>
         
         {/* Ajustado para '' no clique do botão Sair */}
-        <button className="btn btn-light rounded-pill px-4 shadow-sm border" onClick={() => Navigate('/')}>
+        <button className="btn btn-light rounded-pill px-4 shadow-sm border" onClick={() => navigate('/')}>
           <i className="bi bi-x-lg me-2"></i>Sair
         </button>
       </div>
@@ -238,9 +239,9 @@ const handleSubmit = async (e) => {
                     <h5 className="fw-bold">Plano Gratuito</h5>
                     <h3 className="text-success">R$ 0</h3>
                     <ul className="list-unstyled small">
-                      <li>✓ Exibição no guia</li>
-                      <li>✓ WhatsApp</li>
-                      <li>✓ Instagram</li>
+                      <li>✓ Perfil da empresa no Hub</li>
+                      <li>✓ Botão para WhatsApp</li>
+                      <li>✓ Link para Instagram</li>
                     </ul>
                   </div>
                 </div>
@@ -256,11 +257,11 @@ const handleSubmit = async (e) => {
                 >
                   <div className="card-body">
                     <h5 className="fw-bold">⭐ Premium</h5>
-                    <h3 className="text-warning">R$ 29,90</h3>
+                    <h3 className="text-warning">R$ 39,90</h3>
                     <ul className="list-unstyled small">
                       <li>✓ Tudo do Gratuito</li>
                       <li>✓ Carrossel de fotos</li>
-                      <li>✓ Link externo</li>
+                      <li>✓ Link externo para site ou catálogo</li>
                       <li>✓ Destaque Premium</li>
                     </ul>
                   </div>
@@ -280,12 +281,13 @@ const handleSubmit = async (e) => {
                     <h3 style={{ color: '#d4af37' }}>R$ 89,90</h3>
                     <ul className="list-unstyled small">
                       <li>✓ Tudo do Premium</li>
-                      <li>✓ Catálogo interno  estilo iFood</li>
-                      <li>✓ Produtos cadastrados</li>
+                      <li>✓ Vitrine própria dentro do Hub</li>
+                      <li>✓ Produtos, serviços ou cardápio</li>
                       <li>✓ Carrinho de Pedidos</li>
                       <li>✓ Pedidos via WhatsApp automático</li>
+                      <li>✓ Área do Lojista para gerenciamento</li>
+                      <li>✓ Acompanhamento de acessos e resultados</li>
                       <li>✓ Integração com Google Maps</li>
-                      <li>✓ Produtos cadastrados</li>
                       <li>✓ Destaque Gold</li>
                     </ul>
                   </div>

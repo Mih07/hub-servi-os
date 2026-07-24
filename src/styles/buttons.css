@@ -1,0 +1,28 @@
+.botao-principal {
+  min-height: 52px;
+  border: none;
+  border-radius: var(--raio-pequeno);
+  background: var(--cor-primaria);
+  color: var(--cor-texto-claro);
+  font-weight: 700;
+}
+
+.botao-principal:hover {
+  background: var(--cor-primaria-hover);
+  color: var(--cor-texto-claro);
+  transform: translateY(-1px);
+}
+
+.login-lojista-whatsapp{
+  min-height: 48px;
+  border: none;
+  border-radius: var(--raio-pequeno);
+  background-color: var(--cor-sucesso);
+  color: #fff;
+  font-weight: 700;
+}
+
+.login-lojista-whatsapp:hover {
+  background-color: #1faf54;
+  color: #fff;
+}
