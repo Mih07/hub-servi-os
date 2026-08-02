@@ -136,6 +136,7 @@ export default function Home() {
   
         const nomeLoja = loja.nome?.toLowerCase() || '';
         const categoriaLoja = loja.categoria?.toLowerCase() || '';
+        const outraCategoriaLoja = loja.outraCategoria?.toLowerCase() || '';
         const descricaoLoja = loja.descricao?.toLowerCase() || '';
         const enderecoLoja = loja.endereco?.toLowerCase() || '';
         const regiaoLoja = loja.regiao?.toLowerCase() || '';
@@ -144,8 +145,10 @@ export default function Home() {
           termoBusca === '' ||
           nomeLoja.includes(termoBusca) ||
           categoriaLoja.includes(termoBusca) ||
+          outraCategoriaLoja.includes(termoBusca) ||  
           descricaoLoja.includes(termoBusca) ||
-          enderecoLoja.includes(termoBusca);
+          enderecoLoja.includes(termoBusca) ||
+          regiaoLoja.includes(termoBusca);
   
         const matchesCategoria =
           categoriaSelecionada === 'Tudo' ||

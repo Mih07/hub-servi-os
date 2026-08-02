@@ -79,8 +79,11 @@ const handleSubmit = async (e) => {
         {
           nome: formData.nome,
           slug: slugGerado, // <--- ADICIONE ESTA LINHA
-          categoria: formData.categoria === 'Outra'
-              ? formData.outraCategoria: formData.categoria, 
+          categoria: formData.categoria,
+          outraCategoria:
+            formData.categoria === 'Outra'
+              ? formData.outraCategoria
+              : null,
           regiao: formData.regiao,
           endereco: formData.endereco,
           bairro: formData.bairro,
@@ -152,6 +155,7 @@ const handleSubmit = async (e) => {
                   <option value="Cosméticos">Cosméticos</option>
                   <option value="Doces">Doces</option>
                   <option value="Esmalteria">Esmalteria</option>
+                  <option value="Jurídico">Jurídico</option>
                   <option value="Pet">Pet</option>
                   <option value="Salão de Beleza">Salão de Beleza</option>
                   <option value="Saúde">Saúde</option>
