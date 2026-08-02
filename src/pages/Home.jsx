@@ -258,7 +258,7 @@ export default function Home() {
                           </button>
   
                           <ul className="dropdown-menu shadow-lg border-0 w-100 mt-2" aria-labelledby="dropdownMenuButton" style={{ borderRadius: '12px', padding: '10px' }}>
-                            {['Tudo', 'Academia', 'Artesanato', 'Comida', 'Doces', 'Esmalteria', 'Estética', 'Pet', 'Salão de Beleza',  'Saúde', 'Soluções Digitais'].map((cat) => (
+                            {['Tudo', 'Academia', 'Artesanato', 'Comida', 'Doces', 'Esmalteria', 'Estética', 'Jurídico', 'Pet', 'Salão de Beleza',  'Saúde', 'Soluções Digitais'].map((cat) => (
                               <li key={cat}>
                                 <button 
                                   className="dropdown-item py-3 px-3" 
