@@ -6,6 +6,10 @@ import { useNavigate } from 'react-router-dom';
 function Cadastro() {
   const [formData, setFormData] = useState({
     nome: '',
+    email: '',
+    senha: '',
+    confirmarSenha: '',
+    tipo_negocio: '',
     categoria: '',
     outraCategoria: '',
     regiao: '', 
@@ -21,6 +25,8 @@ function Cadastro() {
   const [logoFile, setLogoFile] = useState(null);
   const [fotoExtra1, setFotoExtra1] = useState(null);
   const [fotoExtra2, setFotoExtra2] = useState(null);
+  const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [mostrarConfirmacao, setMostrarConfirmacao] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -62,9 +68,38 @@ function Cadastro() {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
+  // Validação da senha somente para o plano Gold
+  if (formData.plano === 'gold') {
+    if (formData.senha !== formData.confirmarSenha) {
+      alert('As senhas não coincidem.');
+      return;
+    }
+
+    if (formData.senha.length < 6) {
+      alert('A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+  }
+
+  let userId = null;
 
   try {
-    // 1. UPLOAD DAS IMAGENS
+    // 1. CRIAR CONTA DO LOJISTA NO SUPABASE AUTH
+      if (formData.plano === 'gold') {
+        const { data, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.senha,
+        });
+
+        if (authError) {
+          alert(authError.message);
+          return;
+        }
+
+        userId = data.user?.id;
+      }
+
+    // 2. UPLOAD DAS IMAGENS
     const logoUrl = logoFile ? await uploadImage(logoFile) : null;
     const img2 = fotoExtra1 ? await uploadImage(fotoExtra1) : null;
     const img3 = fotoExtra2 ? await uploadImage(fotoExtra2) : null;
@@ -77,8 +112,10 @@ const handleSubmit = async (e) => {
       .from('servicos')
       .insert([
         {
+          user_id: userId,
           nome: formData.nome,
-          slug: slugGerado, // <--- ADICIONE ESTA LINHA
+          tipo_negocio: formData.tipo_negocio,
+          slug: slugGerado, 
           categoria: formData.categoria,
           outraCategoria:
             formData.categoria === 'Outra'
@@ -131,8 +168,115 @@ const handleSubmit = async (e) => {
           
           <div className="row g-3">
             <div className="col-12">
-              <label className="form-label fw-bold small text-uppercase text-secondary">Nome do Estabelecimento</label>
-              <input type="text" name="nome" className="form-control form-control-lg rounded-4 shadow-sm" placeholder="Ex: Nome da sua empresa" required value={formData.nome} onChange={handleChange} />
+          <label className="form-label fw-bold small text-uppercase text-secondary">
+            Nome do Estabelecimento
+          </label>
+          <input
+            type="text"
+            name="nome"
+            className="form-control form-control-lg rounded-4 shadow-sm"
+            placeholder="Ex: Nome da sua empresa"
+            required
+            value={formData.nome}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* DADOS DE ACESSO DO LOJISTA */}
+        <div className="col-md-6">
+          <label className="form-label fw-bold small text-uppercase text-secondary">
+            E-mail de acesso
+          </label>
+
+          <input
+            type="email"
+            name="email"
+            className="form-control form-control-lg rounded-4 shadow-sm"
+            placeholder="Ex: contato@empresa.com"
+            required
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </div>
+
+        {/* DADOS DE ACESSO - SOMENTE GOLD */}
+        {formData.plano === 'gold' && (
+          <>
+            <div className="col-md-3">
+              <label className="form-label fw-bold small text-uppercase text-secondary">
+                Senha
+              </label>
+
+              <div className="input-group">
+                <input
+                  type={mostrarSenha ? "text" : "password"}
+                  name="senha"
+                  className="form-control form-control-lg rounded-start-4 shadow-sm"
+                  placeholder="Crie uma senha"
+                  required
+                  value={formData.senha}
+                  onChange={handleChange}
+                />
+
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary rounded-end-4"
+                  onClick={() => setMostrarSenha(!mostrarSenha)}
+                >
+                  <i className={mostrarSenha ? "bi bi-eye-slash" : "bi bi-eye"}></i>
+                </button>
+              </div>
+            </div>
+
+            <div className="col-md-3">
+              <label className="form-label fw-bold small text-uppercase text-secondary">
+                Confirmar senha
+              </label>
+
+              <div className="input-group">
+                <input
+                  type={mostrarConfirmacao ? "text" : "password"}
+                  name="confirmarSenha"
+                  className="form-control form-control-lg rounded-start-4 shadow-sm"
+                  placeholder="Repita a senha"
+                  required
+                  value={formData.confirmarSenha}
+                  onChange={handleChange}
+                />
+
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary rounded-end-4"
+                  onClick={() => setMostrarConfirmacao(!mostrarConfirmacao)}
+                >
+                  <i
+                    className={
+                      mostrarConfirmacao
+                        ? "bi bi-eye-slash"
+                        : "bi bi-eye"
+                    }
+                  ></i>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
+            {/* TIPO DE NEGÓCIO */}
+            <div className="col-md-6">
+              <label className="form-label fw-bold small text-uppercase text-secondary">Tipo de Negócio</label>
+              <select
+                name="tipo_negocio"
+                className="form-select form-control-lg rounded-4 shadow-sm"
+                value={formData.tipo_negocio}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Selecione o tipo de negócio...</option>
+                <option value="loja">🛍️ Loja</option>
+                <option value="restaurante">🍔 Restaurante</option>
+                <option value="prestador">🛠️ Prestador de serviços</option>
+                <option value="profissional">👤 Profissional</option>
+              </select>
             </div>
 
             {/* 🛠️ CATEGORIA MUDADA PARA SELECT SEGURO */}
