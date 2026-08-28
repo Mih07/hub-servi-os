@@ -9,6 +9,7 @@ import Sobre from './pages/Sobre';
 import LoginLojista from './pages/painel/LoginLojista';
 import DashboardLojista from './pages/painel/DashboardLojista';
 import DashboardAdmin from './pages/painel/DashboardAdmin';
+import RedefinirSenha from './pages/painel/RedefinirSenha';
 
 import './App.css';
 
@@ -24,6 +25,7 @@ function App() {
       <Route path="/login-lojista" element={<LoginLojista />} />
       <Route path="/painel/lojista" element={<DashboardLojista />} />
       <Route path="/painel/admin" element={<DashboardAdmin />} />
+      <Route path="/redefinir-senha" element={<RedefinirSenha />} />
     </Routes>
   );
 }

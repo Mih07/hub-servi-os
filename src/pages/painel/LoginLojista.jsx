@@ -9,6 +9,7 @@ function LoginLojista() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mensagemErro, setMensagemErro] = useState("");
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
 
    // Tema da página (marca, copa, natal, etc.)
   const tema = "";
@@ -40,6 +41,9 @@ function LoginLojista() {
           );
         }
 
+        
+
+
         return;
       }
 
@@ -54,6 +58,45 @@ function LoginLojista() {
     } catch (erro) {
       console.error("Erro inesperado no login:", erro);
 
+      setMensagemErro(
+        "Ocorreu um erro inesperado. Tente novamente em alguns instantes."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEsqueciSenha = async () => {
+    if (!email.trim()) {
+      setMensagemErro("Digite seu e-mail para recuperar a senha.");
+      return;
+    }
+
+    setMensagemErro("");
+    setMensagemSucesso("");
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(
+        email.trim(),
+        {
+          redirectTo: `${window.location.origin}/redefinir-senha`,
+        }
+      );
+
+      if (error) {
+        console.error("Erro ao solicitar recuperação:", error);
+        setMensagemErro(
+          "Não foi possível enviar o e-mail de recuperação. Tente novamente."
+        );
+        return;
+      }
+
+      setMensagemSucesso(
+        "Enviamos um link para seu e-mail para redefinir sua senha."
+      );
+    } catch (erro) {
+      console.error("Erro inesperado:", erro);
       setMensagemErro(
         "Ocorreu um erro inesperado. Tente novamente em alguns instantes."
       );
@@ -156,6 +199,15 @@ function LoginLojista() {
                     >
                       <i className="bi bi-exclamation-circle-fill"></i>
                       <span>{mensagemErro}</span>
+                    </div>
+                  )}
+                  {mensagemSucesso && (
+                    <div
+                      className="alert alert-success d-flex align-items-center gap-2"
+                      role="alert"
+                    >
+                      <i className="bi bi-check-circle-fill"></i>
+                      <span>{mensagemSucesso}</span>
                     </div>
                   )}
 
@@ -261,6 +313,16 @@ function LoginLojista() {
                         </>
                       )}
                     </button>
+                    <div>
+                      <button
+                        type="button"
+                        className="btn btn-link p-0 text-decoration-none mt-2"
+                        onClick={handleEsqueciSenha}
+                        disabled={loading}
+                      >
+                        Esqueci minha senha
+                      </button>
+                    </div>
                   </form>
 
                   <div className="login-lojista-ajuda mt-4 p-3 text-center">
