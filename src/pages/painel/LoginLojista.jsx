@@ -42,8 +42,6 @@ function LoginLojista() {
         }
 
         
-
-
         return;
       }
 
@@ -52,9 +50,36 @@ function LoginLojista() {
         return;
       }
 
-      console.log("Login realizado:", data.user);
+      const { data: cadastro, error: erroCadastro } = await supabase
+        .from("servicos")
+        .select("aprovado, plano, nome")
+        .eq("user_id", data.user.id)
+        .single();
 
-      navigate("/painel/lojista");
+      if (erroCadastro) {
+        console.error("Erro ao buscar cadastro:", erroCadastro);
+        setMensagemErro(
+          "Não foi possível acessar os dados do seu cadastro. Tente novamente."
+        );
+        return;
+      }
+
+      if (!cadastro)
+        setMensagemErro(
+      "Não encontramos um cadastro associado a este usuário. Entre em contato com o suporte para mais informações."
+    );
+
+    if (!cadastro.aprovado) {
+      setMensagemErro(
+        "Seu cadastro ainda não foi aprovado. Aguarde a aprovação para acessar o painel."
+      );
+      return;
+    }
+    console.log("Login autorizado:", cadastro);
+    navigate("/painel/lojista");
+
+    
+
     } catch (erro) {
       console.error("Erro inesperado no login:", erro);
 
