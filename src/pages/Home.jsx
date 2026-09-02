@@ -209,6 +209,7 @@ export default function Home() {
                           <option value="Louveira, SP">Louveira, SP</option>
                           <option value="Cabreúva, SP">Cabreúva, SP</option>
                           <option value="Campinas, SP">Campinas, SP</option>
+                          <option value="Elias Fausto, SP">Elias Fausto, SP</option>
                         </select>
                       </div>
                     </div>
