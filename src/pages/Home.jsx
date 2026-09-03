@@ -262,7 +262,7 @@ export default function Home() {
                           </button>
   
                           <ul className="dropdown-menu shadow-lg border-0 w-100 mt-2" aria-labelledby="dropdownMenuButton" style={{ borderRadius: '12px', padding: '10px' }}>
-                            {['Tudo', 'Academia', 'Alimentação', 'Artesanato & Personalização', 'Automotivo', 'Beleza & Estética', 'Casa & Decoração', 'Cosméticos & Perfumaria', 'Construção & Reformas', 'Doces & Confeitaria', 'Educação & Cursos', 'Eventos & Entretedimento', 'Flores & Plantas', 'Imovéis & Serviços Imobiliários', 'Jurídico & Contabilidade',  'Logísitca & Entregas', 'Moda e Acessórios', 'Pet & Animais',  'Saúde & Bem Estar', 'Serviços para Casa', 'Tecnologia & Soluções Digitais', 'Comércio Geral', 'Outra'].map((cat) => (
+                            {['Tudo', 'Academia', 'Alimentação', 'Artesanato & Personalização', 'Automotivo', 'Beleza & Estética', 'Casa & Decoração', 'Cosméticos & Perfumaria', 'Construção & Reformas', 'Doces & Confeitaria', 'Educação & Cursos', 'Eventos & Entretedimento', 'Flores & Plantas', 'Imovéis & Serviços Imobiliários', 'Jurídico & Contabilidade',  'Logísitca & Entregas', 'Moda e Acessórios', 'Pet & Animais',  'Saúde & Bem Estar', 'Serviços para Casa', 'Tecnologia & Soluções Digitais', 'Comércio Geral', 'Outras Categorias'].map((cat) => (
                               <li key={cat}>
                                 <button 
                                   className="dropdown-item py-3 px-3" 
