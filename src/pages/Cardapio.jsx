@@ -231,23 +231,20 @@ if (lojista.plano !== 'gold') {
       {/* Cabeçalho da Loja */}
       <header className="text-center pb-4 border-bottom mb-4 bg-white">
           {/* Logo da Loja */}
-          {lojista.logo_url && (
+          {lojista.imagem && (
             <div className="mb-3">
-              {lojista.imagem && (
-                <div className="mb-3">
-                  <img 
-                    src={lojista.imagem} 
-                    alt={lojista.nome} 
-                    className="rounded-circle shadow-sm border border-light" 
-                    style={{ width: '100px', height: '100px', objectFit: 'cover' }} 
-                  />
-                </div>
-              )}
+              <img 
+                src={lojista.imagem} 
+                alt={lojista.nome} 
+                className="rounded-circle shadow-sm border border-light" 
+                style={{ width: '100px', height: '100px', objectFit: 'cover' }} 
+              />
+            </div>
           )}
           {/* Status de Loja */}
           
           {/* Nome do Comércio */}
-          <h1 className="fw-bold h2 mb-1" style={{ color: '#2d3436' }}>{lojista.nome_comercio}</h1>
+          <h1 className="fw-bold h2 mb-1" style={{ color: '#2d3436' }}>{lojista.nome}</h1>
           
           {/* Badge de Verificação Hub */}
           <div className="mb-3">
@@ -258,13 +255,20 @@ if (lojista.plano !== 'gold') {
 
           {/* Informações de Contato/Localização */}
           <div className="d-flex flex-column align-items-center gap-1 text-muted small">
-            {lojista.endereco_loja && (
+            {lojista.endereco && (
               <div className="d-flex align-items-center">
                 <i className="bi bi-geo-alt-fill me-1"></i>
-                <span>{lojista.endereco_loja}</span>
+                <span>{lojista.endereco}</span>
               </div>
             )}
-            
+
+            {lojista.bairro && (
+              <div className="d-flex align-items-center">
+                <i className="bi bi-geo-alt me-1"></i>
+                <span>{lojista.bairro}</span>
+              </div>
+            )}
+
             {lojista.horario_funcionamento && (
               <div className="d-flex align-items-center">
                 <i className="bi bi-clock-fill me-1"></i>
