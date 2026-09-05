@@ -294,17 +294,61 @@ const handleSubmit = async (e) => {
                 >
                   <option value="">Selecione uma categoria...</option>
                   <option value="Academia">Academia</option>
-                  <option value="Artesanato">Artesanato</option>
-                  <option value="Comida">Comida</option>
-                  <option value="Cosméticos">Cosméticos</option>
-                  <option value="Doces">Doces</option>
-                  <option value="Esmalteria">Esmalteria</option>
-                  <option value="Jurídico">Jurídico</option>
-                  <option value="Pet">Pet</option>
-                  <option value="Salão de Beleza">Salão de Beleza</option>
-                  <option value="Saúde">Saúde</option>
-                  <option value="Soluções Digitais">Soluções Digitais</option>
-                  <option value="Outra">Outra...</option>
+                  <option value="Alimentação">Alimentação</option>
+                  <option value="Artesanato & Personalização">
+                    Artesanato & Personalização
+                  </option>
+                  <option value="Automotivo">Automotivo</option>
+                  <option value="Beleza & Estética">Beleza & Estética</option>
+                  <option value="Casa & Decoração">Casa & Decoração</option>
+                  <option value="Cosméticos & Perfumaria">
+                    Cosméticos & Perfumaria
+                  </option>
+                  <option value="Construção & Reformas">
+                    Construção & Reformas
+                  </option>
+                  <option value="Doces & Confeitaria">
+                    Doces & Confeitaria
+                  </option>
+                  <option value="Educação & Cursos">
+                    Educação & Cursos
+                  </option>
+                  <option value="Eventos & Entretenimento">
+                    Eventos & Entretenimento
+                  </option>
+                  <option value="Flores & Plantas">
+                    Flores & Plantas
+                  </option>
+                  <option value="Imóveis & Serviços Imobiliários">
+                    Imóveis & Serviços Imobiliários
+                  </option>
+                  <option value="Jurídico & Contabilidade">
+                    Jurídico & Contabilidade
+                  </option>
+                  <option value="Logística & Entregas">
+                    Logística & Entregas
+                  </option>
+                  <option value="Moda & Acessórios">
+                    Moda & Acessórios
+                  </option>
+                  <option value="Pet & Animais">
+                    Pet & Animais
+                  </option>
+                  <option value="Saúde & Bem-estar">
+                    Saúde & Bem-estar
+                  </option>
+                  <option value="Serviços para Casa">
+                    Serviços para Casa
+                  </option>
+                  <option value="Tecnologia & Soluções Digitais">
+                    Tecnologia & Soluções Digitais
+                  </option>
+                  <option value="Comércio em Geral">
+                    Comércio em Geral
+                  </option>
+                  <option value="Outras Categorias">
+                    Outras Categorias
+                  </option>
                 </select>
 
                 {formData.categoria === 'Outra' && (
