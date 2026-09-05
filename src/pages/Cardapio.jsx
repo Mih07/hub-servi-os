@@ -233,13 +233,16 @@ if (lojista.plano !== 'gold') {
           {/* Logo da Loja */}
           {lojista.logo_url && (
             <div className="mb-3">
-              <img 
-                src={lojista.logo_url} 
-                alt={lojista.nome_comercio} 
-                className="rounded-circle shadow-sm border border-light" 
-                style={{ width: '100px', height: '100px', objectFit: 'cover' }} 
-              />
-            </div>
+              {lojista.imagem && (
+                <div className="mb-3">
+                  <img 
+                    src={lojista.imagem} 
+                    alt={lojista.nome} 
+                    className="rounded-circle shadow-sm border border-light" 
+                    style={{ width: '100px', height: '100px', objectFit: 'cover' }} 
+                  />
+                </div>
+              )}
           )}
           {/* Status de Loja */}
           
