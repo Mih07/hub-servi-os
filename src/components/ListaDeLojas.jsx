@@ -1,3 +1,4 @@
+import React from "react";
 import {
   AiFillHeart,
   AiOutlineHeart,
@@ -6,6 +7,7 @@ import {
 
 export default function ListaDeLojas({
   lojasFiltradas,
+  lojasEmDestaque,
   carregando,
   favoritos,
   toggleFavorito,
@@ -18,7 +20,169 @@ export default function ListaDeLojas({
   montarLinkSeguro,
   navigate,
 }) {
+
   return (
+        <>
+        {/* ⭐ TOP DO HUB */}
+      {lojasEmDestaque.length > 0 && (
+        <section className="mb-4 px-3">
+          <div className="mx-auto" style={{ maxWidth: '1300px' }}>
+
+            <h2 className="fw-bold mb-3" style={{ color: '#d63384' }}>
+              ⭐ Top do Hub
+            </h2>
+
+            <div className="position-relative">
+
+              {/* SETA ESQUERDA */}
+              <button
+                type="button"
+                className="btn shadow-sm position-absolute"
+                style={{
+                  backgroundColor: '#d63384',
+                  color: '#fff',
+                  border: 'none',
+                  left: '-15px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 10,
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  fontSize: '20px'
+                }}
+                onClick={() => {
+                  document
+                    .getElementById('top-hub-carrossel')
+                    ?.scrollBy({ left: -300, behavior: 'smooth' });
+                }}
+              >
+                ←
+              </button>
+
+              {/* CARDS */}
+              <div
+                id="top-hub-carrossel"
+                className="d-flex gap-3 overflow-auto pb-2"
+                style={{
+                  scrollSnapType: 'x mandatory',
+                  WebkitOverflowScrolling: 'touch',
+                  scrollbarWidth: 'none'
+                }}
+              >
+                {lojasEmDestaque.map((loja) => (
+                  <div
+                    key={`destaque-${loja.id || loja.nome}`}
+                    style={{
+                      minWidth: '280px',
+                      maxWidth: '280px',
+                      scrollSnapAlign: 'start'
+                    }}
+                  >
+                    <div
+                      className="card h-100 shadow-sm border-0 overflow-hidden"
+                      style={{
+                        borderRadius: '18px',
+                        backgroundColor: '#fff'
+                      }}
+                    >
+
+                      <div
+                        style={{
+                          height: '140px',
+                          backgroundColor: '#f3d5f5',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        {loja.imagem ? (
+                          <img
+                            src={loja.imagem}
+                            alt={loja.nome}
+                            className="w-100 h-100"
+                            style={{ objectFit: 'cover' }}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="d-flex align-items-center justify-content-center h-100">
+                            <span className="fw-bold text-secondary">
+                              {loja.categoria}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="card-body">
+                        <h5 className="fw-bold mb-1">
+                          {loja.nome}
+                        </h5>
+
+                        <p className="text-muted mb-2 small">
+                          {loja.categoria}
+                        </p>
+
+                        <p className="text-muted small mb-3">
+                          📍 {loja.cidade || 'Itupeva - SP'}
+                        </p>
+
+                        <button
+                          className="btn btn-sm w-100"
+                          style={{
+                            backgroundColor: '#d63384',
+                            color: '#fff',
+                            borderRadius: '10px'
+                          }}
+                          onClick={() => navigate(`/lojista/${loja.slug}`)}
+                        >
+                          Conhecer →
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* SETA DIREITA */}
+              <button
+                type="button"
+                className="btn shadow-sm position-absolute"
+                style={{
+                  backgroundColor: '#d63384',
+                  color: '#fff',
+                  border: 'none',
+                  right: '-15px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  zIndex: 10,
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  fontSize: '20px'
+                }}
+                onClick={() => {
+                  document
+                    .getElementById('top-hub-carrossel')
+                    ?.scrollBy({ left: 300, behavior: 'smooth' });
+                }}
+              >
+                →
+              </button>
+
+            </div>
+          </div>
+        
+        </section>
+      )}
+      {/* GRID DE CARDS COM FEEDBACK DE CARREGAMENTO */}
+              <div className="container mb-3">
+                <p className="text-muted">
+                  Resultados encontrados: {lojasFiltradas.length}
+                </p>
+              </div>
+            <div className="position-relative"></div>
+
+      
+
     <main className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 px-3 mx-auto" style={{ maxWidth: '1300px' }}>
             {carregando ? (
               <div className="col-12 text-center py-5">
@@ -29,15 +193,17 @@ export default function ListaDeLojas({
         lojasFiltradas.map((loja) => {
           const isPremium = loja.plano === 'premium';
           const isGold = loja.plano === 'gold';
-          const isDestaque = isPremium || isGold;
+          const isPlanoDestaque = isPremium || isGold;
           const idCarrossel = `carousel-${loja.nome ? loja.nome.replace(/[^a-zA-Z0-9]/g, '') : 'id'}`;
-          return (
+          
+         return (
             <article key={loja.id || loja.nome} id={loja.id} className="col">
+
               <div 
-                className={`card h-100 shadow-sm overflow-hidden position-relative ${isDestaque ? 'border border-warning-subtle' : 'border-0'}`} 
-                style={{ borderRadius: '18px', backgroundColor: '#fff', transform: isDestaque ? 'scale(1.01)' : 'none' }}
+                className={`card h-100 shadow-sm overflow-hidden position-relative ${isPlanoDestaque ? 'border border-warning-subtle' : 'border-0'}`} 
+                style={{ borderRadius: '18px', backgroundColor: '#fff', transform: isPlanoDestaque ? 'scale(1.01)' : 'none' }}
               >
-                {isDestaque && (
+                {isPlanoDestaque && (
                   <div style={{
                     position: 'absolute', top: '15px', right: '15px', 
                     backgroundColor: isGold ? '#ff7b00' : '#ffc107', // Ouro para Gold, Amarelo para Premium
@@ -48,7 +214,7 @@ export default function ListaDeLojas({
                   </div>
                 )}
                 
-                {isDestaque && (loja.imagem2 || loja.imagem3) ? (
+                {isPlanoDestaque && (loja.imagem2 || loja.imagem3) ? (
                   <div id={idCarrossel} className="carousel slide" data-bs-ride="carousel" style={{ height: '180px' }}>
                     <div className="carousel-inner h-100">
                       <div className="carousel-item active h-100" style={{ backgroundColor: '#f3d5f5' }}>
@@ -124,7 +290,7 @@ export default function ListaDeLojas({
                   </div>
                   
                   <div className="mt-auto d-flex align-items-center justify-content-between pt-2 border-top">
-                    {isDestaque ? (
+                    {isPlanoDestaque ? (
                       <button 
                         onClick={() => { 
                           // Esta linha abaixo é a que envia o dado para o Supabase
@@ -176,4 +342,6 @@ export default function ListaDeLojas({
         })
       )}
     </main>
-)}
+  </>
+  );
+}

@@ -127,44 +127,44 @@ export default function Home() {
       }, []);
   
     // 4. Lógica do Filtro Inteligente
-    // 1. Define o peso de cada plano para a ordenação
-    const pesos = { 'gold': 1, 'premium': 2, 'free': 3 };
-  
+      
     const lojasFiltradas = lojas
       .filter((loja) => {
         const termoBusca = busca.trim().toLowerCase();
-  
+
         const nomeLoja = loja.nome?.toLowerCase() || '';
         const categoriaLoja = loja.categoria?.toLowerCase() || '';
         const outraCategoriaLoja = loja.outraCategoria?.toLowerCase() || '';
         const descricaoLoja = loja.descricao?.toLowerCase() || '';
         const enderecoLoja = loja.endereco?.toLowerCase() || '';
         const regiaoLoja = loja.regiao?.toLowerCase() || '';
-  
+
         const matchesBusca =
           termoBusca === '' ||
           nomeLoja.includes(termoBusca) ||
           categoriaLoja.includes(termoBusca) ||
-          outraCategoriaLoja.includes(termoBusca) ||  
+          outraCategoriaLoja.includes(termoBusca) ||
           descricaoLoja.includes(termoBusca) ||
           enderecoLoja.includes(termoBusca) ||
           regiaoLoja.includes(termoBusca);
-  
+
         const matchesCategoria =
           categoriaSelecionada === 'Tudo' ||
-          (loja.categoria && loja.categoria.trim().toLowerCase() === categoriaSelecionada.trim().toLowerCase());
-  
+          (loja.categoria &&
+            loja.categoria.trim().toLowerCase() === categoriaSelecionada.trim().toLowerCase());
+
         const matchesRegiao =
-        regiaoSelecionada === '' || // Se nada estiver selecionado
-        (loja.regiao && loja.regiao.toLowerCase().includes(regiaoSelecionada.toLowerCase().split(',')[0].trim()));
-      
+          regiaoSelecionada === '' ||
+          (loja.regiao &&
+            loja.regiao.toLowerCase().includes(
+              regiaoSelecionada.toLowerCase().split(',')[0].trim()
+            ));
+
         return matchesBusca && matchesCategoria && matchesRegiao;
-      })
-      .sort((a, b) => {
-        // Ordena de acordo com o peso definido acima. 
-        // Se a loja não tiver um plano mapeado, ganha peso 99 (vai para o fim)
-        return (pesos[a.plano] || 99) - (pesos[b.plano] || 99);
       });
+      const lojasEmDestaque = lojasFiltradas.filter(
+        (loja) => loja.destaque === true
+      );
   
     return (
   
@@ -308,12 +308,7 @@ export default function Home() {
               </div>
               
   
-              {/* GRID DE CARDS COM FEEDBACK DE CARREGAMENTO */}
-              <div className="container mb-3">
-                <p className="text-muted">
-                  Resultados encontrados: {lojasFiltradas.length}
-                </p>
-              </div>
+          
   
   {/* Seção de Favoritos Rápidos */}
   
@@ -362,6 +357,7 @@ export default function Home() {
 
   <ListaDeLojas
       lojasFiltradas={lojasFiltradas}
+      lojasEmDestaque={lojasEmDestaque}
       carregando={carregando}
       favoritos={favoritos}
       toggleFavorito={toggleFavorito}
