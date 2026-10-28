@@ -1,31 +1,38 @@
+
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer id="contato" className="bg-white border-top mt-5"
-    style={{
+    <footer
+      id="contato"
+      className="bg-white border-top mt-5"
+      style={{
         background: 'var(--gradiente-principal)'
-      }}>
-      <div className="container py-4"> {/* Diminuí o padding de py-5 para py-4 */}
+      }}
+    >
+      <div className="container py-4">
         <div className="row justify-content-center text-center g-4">
-          
-          {/* Coluna Centralizada e Estreita */}
           <div className="col-md-6 col-lg-4">
             <h5 className="fw-bold mb-2" style={{ color: '#5d4037' }}>
               <span style={{ color: '#d63384' }}>Hub</span> Serviços
             </h5>
+
             <p className="text-muted small mb-4">
               O seu guia definitivo de comércio e serviços em Itupeva e região.
             </p>
 
             <div className="d-flex flex-column align-items-center gap-3">
-              <p className="fw-bold mb-0" style={{ color: '#5d4037' }}>Fale Conosco:</p>
-              <a 
-                href="https://wa.me/5511971128269" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <p className="fw-bold mb-0" style={{ color: '#5d4037' }}>
+                Fale Conosco:
+              </p>
+
+              <a
+                href="https://wa.me/5511971128269"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="btn btn-success rounded-pill px-4 fw-bold shadow-sm btn-sm"
                 style={{ backgroundColor: '#25D366', border: 'none' }}
               >
@@ -33,16 +40,29 @@ const Footer = () => {
               </a>
             </div>
           </div>
-
         </div>
       </div>
 
-      {/* Faixa Inferior mais fina */}
       <div className="py-2" style={{ backgroundColor: '#1a1412' }}>
         <div className="container text-center">
-          <p className="mb-0" style={{ color: '#8b807a', fontSize: '0.75rem' }}>
-            © {currentYear} Hub Serviços. Desenvolvido por <strong>Seu Site, Sua Cara</strong>.
+          <p
+            className="mb-1"
+            style={{ color: '#8b807a', fontSize: '0.75rem' }}
+          >
+            © {currentYear} Hub Serviços. Desenvolvido por{' '}
+            <strong>Seu Site, Sua Cara</strong>.
           </p>
+
+          <Link
+            to="/login-admin"
+            className="text-decoration-none"
+            style={{
+              color: '#b8aaa3',
+              fontSize: '0.7rem'
+            }}
+          >
+            Acesso administrativo
+          </Link>
         </div>
       </div>
     </footer>
