@@ -1,15 +1,20 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "../../supabaseClient";
 import "../../styles/login.css";
 
 function LoginLojista() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [searchParams] = useSearchParams();
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mensagemErro, setMensagemErro] = useState("");
-  const [mensagemSucesso, setMensagemSucesso] = useState("");
+  const [mensagemSucesso, setMensagemSucesso] = useState(
+  searchParams.get("confirmado") === "1"
+    ? "E-mail confirmado com sucesso! Seu cadastro está aguardando aprovação da equipe do Hub Serviços. Você poderá acessar sua Central do Lojista após a liberação."
+    : ""
+);
 
    // Tema da página (marca, copa, natal, etc.)
   const tema = "";

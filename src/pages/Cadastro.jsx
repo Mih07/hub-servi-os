@@ -116,15 +116,15 @@ const handleSubmit = async (e) => {
 
   try {
     
+
     // 1. CRIAR CONTA DO LOJISTA PARA TODOS OS PLANOS
-    // 1. CRIAR CONTA DO LOJISTA PARA TODOS OS PLANOS
-const { data, error: authError } = await supabase.auth.signUp({
-  email: formData.email.trim(),
-  password: formData.senha,
-  options: {
-    emailRedirectTo: `${window.location.origin}/login-lojista`,
-  },
-});
+    const { data, error: authError } = await supabase.auth.signUp({
+      email: formData.email.trim(),
+      password: formData.senha,
+      options: {
+        emailRedirectTo: `${window.location.origin}/login-lojista?confirmado=1`,
+      },
+    });
 
     if (authError) {
       alert(authError.message);
