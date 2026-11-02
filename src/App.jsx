@@ -6,6 +6,7 @@ import Cadastro from './pages/Cadastro';
 import Cardapio from './pages/Cardapio';
 import Favoritos from './pages/Favoritos';
 import Sobre from './pages/Sobre';
+import PaginaPremium from './pages/PaginaPremium';
 
 import LoginLojista from './pages/painel/LoginLojista';
 import DashboardLojista from './pages/painel/DashboardLojista';
@@ -24,6 +25,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/lojista/:slug" element={<Cardapio />} />
+        <Route path="/lojista-premium/:slug"element={<PaginaPremium />}/>
         <Route path="/sobre" element={<Sobre />} />
         <Route path="/favoritos" element={<Favoritos />} />
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   AiFillHeart,
   AiOutlineHeart,
@@ -20,6 +20,7 @@ export default function ListaDeLojas({
   montarLinkSeguro,
   navigate,
 }) {
+  const [descricoesExpandidas, setDescricoesExpandidas] = useState({});
 
   return (
         <>
@@ -131,7 +132,15 @@ export default function ListaDeLojas({
                             color: '#fff',
                             borderRadius: '10px'
                           }}
-                          onClick={() => navigate(`/lojista/${loja.slug}`)}
+                          onClick={() => {
+                            if (loja.plano === "premium") {
+                              navigate(`/lojista-premium/${loja.slug}`);
+                            } else if (loja.plano === "gold") {
+                              navigate(`/lojista/${loja.slug}`);
+                            } else {
+                              navigate(`/lojista-premium/${loja.slug}`);
+                            }
+                          }}
                         >
                           Conhecer →
                         </button>
@@ -275,10 +284,38 @@ export default function ListaDeLojas({
                   )}
                   
                   {loja.descricao && (
-                    <p className="text-secondary small bg-light p-2 rounded-3 mb-2 border-start border-3" style={{ fontStyle: 'italic', fontSize: '0.85rem', lineHeight: '1.3', borderLeftColor: '#d63384' }}>
+                  <div className="mb-2">
+                    <p
+                      className="text-secondary small bg-light p-2 rounded-3 border-start border-3"
+                      style={{
+                        fontStyle: "italic",
+                        fontSize: "0.85rem",
+                        lineHeight: "1.3",
+                        borderLeftColor: "#d63384",
+                        display: "-webkit-box",
+                        WebkitLineClamp: descricoesExpandidas[loja.id] ? "unset" : 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: descricoesExpandidas[loja.id] ? "visible" : "hidden",
+                      }}
+                    >
                       "{loja.descricao}"
                     </p>
-                  )}
+
+                    <button
+                      type="button"
+                      className="btn btn-link btn-sm p-0 text-decoration-none"
+                      style={{ color: "#d63384", fontSize: "0.8rem" }}
+                      onClick={() =>
+                        setDescricoesExpandidas((prev) => ({
+                          ...prev,
+                          [loja.id]: !prev[loja.id],
+                        }))
+                      }
+                    >
+                      {descricoesExpandidas[loja.id] ? "Ver menos" : "Ver mais"}
+                    </button>
+                  </div>
+                )}
                   
                   <div className="d-flex gap-2 mb-3">
                     <button onClick={() => toggleFavorito(loja.id)} className="btn btn-sm btn-outline-secondary rounded-circle border-0" style={{ width: '35px', height: '35px', color: favoritos.includes(loja.id) ? '#d63384' : '#6c757d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -291,20 +328,24 @@ export default function ListaDeLojas({
                   
                   <div className="mt-auto d-flex align-items-center justify-content-between pt-2 border-top">
                     {isPlanoDestaque ? (
-                      <button 
-                        onClick={() => { 
-                          // Esta linha abaixo é a que envia o dado para o Supabase
-                          if (loja.link) {
-                            window.open(loja.link, '_blank');
-                            } else {
-                            registrarClique(loja.id, 'catalogo');
+                      <button
+                        onClick={() => {
+                          if (isPremium) {
+                            registrarClique(loja.id, "perfil_premium");
+                            navigate(`/lojista-premium/${loja.slug}`);
+                          } else {
+                            registrarClique(loja.id, "catalogo");
                             navigate(`/lojista/${loja.slug || loja.id}`);
-                            }
-                        }} 
-                        className="btn btn-sm btn-primary rounded-pill px-4 fw-bold w-100" 
-                        style={{ fontSize: '0.85rem', backgroundColor: '#d63384', borderColor: '#d63384' }}
+                          }
+                        }}
+                        className="btn btn-sm btn-primary rounded-pill px-4 fw-bold w-100"
+                        style={{
+                          fontSize: "0.85rem",
+                          backgroundColor: "#d63384",
+                          borderColor: "#d63384",
+                        }}
                       >
-                        Ver Catálogo ➔
+                        {isPremium ? "Conhecer perfil →" : "Ver vitrine →"}
                       </button>
                     ) : (
                       <div className="d-flex gap-2">

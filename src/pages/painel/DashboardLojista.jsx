@@ -15,7 +15,7 @@ function DashboardLojista() {
 
         const { data: cadastro, error } = await supabase
             .from("servicos")
-            .select("nome, plano, tipo_negocio, aprovado")
+            .select("nome, plano, tipo_negocio, aprovado, slug")
             .eq("user_id", user.id)
             .single();
 
@@ -150,9 +150,23 @@ const handleLogout = async () => {
                 <button
                     type="button"
                     className="btn btn-primary rounded-3"
-                >
+                    onClick={() => {
+                        if (!lojista?.slug) {
+                        alert("Não foi possível localizar o endereço do seu negócio.");
+                        return;
+                        }
+
+                        if (lojista.plano === "premium") {
+                        navigate(`/lojista-premium/${lojista.slug}`);
+                        } else if (lojista.plano === "gold") {
+                        navigate(`/lojista/${lojista.slug}`);
+                        } else {
+                        navigate("/");
+                        }
+                    }}
+                    >
                     Ver minha página
-                </button>
+                    </button>
             </div>
         </div>
 

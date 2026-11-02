@@ -16,6 +16,7 @@ export default function Home() {
     const [slugLojistaAtivo, setSlugLojistaAtivo] = useState('');
     const [notas, setNotas] = useState({});
     const [hover, setHover] = useState({ lojaId: null, nota: 0 });
+    const [categoriasExpandidas, setCategoriasExpandidas] = useState(false);
     // 1. Estado dos favoritos (já iniciando com o que estiver no localStorage)
     const [favoritos, setFavoritos] = useState(() => {
     const salvos = localStorage.getItem('meusFavoritos');
@@ -165,6 +166,31 @@ export default function Home() {
       const lojasEmDestaque = lojasFiltradas.filter(
         (loja) => loja.destaque === true
       );
+
+      const categorias = [
+        { nome: 'Academia', icone: 'bi-heart-pulse' },
+        { nome: 'Alimentação', icone: 'bi-cup-hot' },
+        { nome: 'Artesanato & Personalização', icone: 'bi-palette' },
+        { nome: 'Automotivo', icone: 'bi-car-front' },
+        { nome: 'Beleza & Estética', icone: 'bi-stars' },
+        { nome: 'Casa & Decoração', icone: 'bi-house-heart' },
+        { nome: 'Cosméticos & Perfumaria', icone: 'bi-droplet' },
+        { nome: 'Construção & Reformas', icone: 'bi-tools' },
+        { nome: 'Doces & Confeitaria', icone: 'bi-cake2' },
+        { nome: 'Educação & Cursos', icone: 'bi-mortarboard' },
+        { nome: 'Eventos & Entretedimento', icone: 'bi-balloon' },
+        { nome: 'Flores & Plantas', icone: 'bi-flower1' },
+        { nome: 'Imovéis & Serviços Imobiliários', icone: 'bi-building' },
+        { nome: 'Jurídico & Contabilidade', icone: 'bi-briefcase' },
+        { nome: 'Logísitca & Entregas', icone: 'bi-truck' },
+        { nome: 'Moda e Acessórios', icone: 'bi-handbag' },
+        { nome: 'Pet & Animais', icone: 'bi-paw-print' },
+        { nome: 'Saúde & Bem Estar', icone: 'bi-activity' },
+        { nome: 'Serviços para Casa', icone: 'bi-wrench' },
+        { nome: 'Tecnologia & Soluções Digitais', icone: 'bi-laptop' },
+        { nome: 'Comércio Geral', icone: 'bi-shop' },
+        { nome: 'Outras Categorias', icone: 'bi-grid' }
+      ];
   
     return (
   
@@ -177,22 +203,46 @@ export default function Home() {
                 <div className="container py-4 px-3">
                   <div className="row align-items-start mb-4">
                     <div className="col-lg-8 d-flex align-items-center">
-                      <div className="mb-2">
-                        <img 
-                          src="/logo-hub.png" 
-                          alt="Hub Serviços" 
-                          style={{ maxWidth: '80px', height: 'auto', objectFit: 'cover', borderRadius: '15px' }} 
-                          className="me-3 shadow-sm"
-                        />
+                    
+                    <div className="d-flex align-items-center gap-3">
+                      <img
+                        src="/logo-hub.png"
+                        alt="Hub Serviços"
+                        style={{
+                          maxWidth: '80px',
+                          height: 'auto',
+                          objectFit: 'cover',
+                          borderRadius: '15px'
+                        }}
+                        className="shadow-sm"
+                      />
+
+                      <div>
+                        <h1
+                          className="fw-bold mb-1"
+                          style={{
+                            color: '#d63384',
+                            fontSize: '1.6rem',
+                            letterSpacing: '-0.5px'
+                          }}
+                        >
+                          Hub Serviços
+                        </h1>
+
+                        <p
+                          className="text-muted mb-0"
+                          style={{
+                            fontSize: '0.85rem',
+                            lineHeight: '1.5',
+                            maxWidth: '350px'
+                          }}
+                        >
+                          Tudo o que você procura na sua região, em um só lugar.
+                        </p>
                       </div>
-                      <h1 className="fw-bold mb-2" style={{ color: '#5d4037', fontSize: '1.9rem', letterSpacing: '-1.0px', }}>
-                        Serviços, comércios e negócios da sua região | <span className="fw-bolder ms-2" style={{color: '#d63384', fontWeight: 900}}>Hub Serviços</span>
-                      </h1>
                     </div>
-                    <p className="text-muted mt-4" style={{ maxWidth: '450px', fontSize: '1.05rem' }}>
-                        Encontre serviços, comércios e negócios da sua região. 
-                        Clique no banner para acessar <strong>catálogos, cardápios e contatos diretos </strong>em um só lugar.
-                    </p>
+                  </div>
+                    
   
                     <div className="col-lg-4 text-lg-end mt-3 mt-lg-0">
                       <div className="d-inline-flex align-items-center bg-light px-3 py-2 rounded-pill border shadow-sm" style={{ backgroundColor: '#fff9e6', borderColor: '#ffe69c' }}>
@@ -235,56 +285,163 @@ export default function Home() {
   
                       
   
-                      <div className="d-flex justify-content-center mb-5 px-3"></div>
-                                  
-                      <div className="d-flex justify-content-center mb-5 px-3">
-                        <div className="dropdown w-100" style={{ maxWidth: '400px' }}>
-                          <button 
-                            className="btn d-flex align-items-center justify-content-between w-100 border-0" 
-                            type="button" 
-                            id="dropdownMenuButton" 
-                            data-bs-toggle="dropdown" 
-                            aria-expanded="false"
-                            style={{
-                              borderBottom: '1px solid #333', 
-                              borderRadius: '0',
-                              padding: '12px 5px',
-                              fontSize: '1rem',
-                              fontWeight: '700',
-                              letterSpacing: '0px',
-                              color: '#000',
-                              backgroundColor: 'transparent'
-                            }}
-                          >
-                            <span className="text-uppercase">
-                              {categoriaSelecionada === 'Tudo' ? 'CATEGORIAS' : categoriaSelecionada}
-                            </span>
-                            <span style={{ fontSize: '0.7rem' }} aria-hidden="true">▼</span>
-                          </button>
-  
-                          <ul className="dropdown-menu shadow-lg border-0 w-100 mt-2" aria-labelledby="dropdownMenuButton" style={{ borderRadius: '12px', padding: '10px' }}>
-                            {['Tudo', 'Academia', 'Alimentação', 'Artesanato & Personalização', 'Automotivo', 'Beleza & Estética', 'Casa & Decoração', 'Cosméticos & Perfumaria', 'Construção & Reformas', 'Doces & Confeitaria', 'Educação & Cursos', 'Eventos & Entretedimento', 'Flores & Plantas', 'Imovéis & Serviços Imobiliários', 'Jurídico & Contabilidade',  'Logísitca & Entregas', 'Moda e Acessórios', 'Pet & Animais',  'Saúde & Bem Estar', 'Serviços para Casa', 'Tecnologia & Soluções Digitais', 'Comércio Geral', 'Outras Categorias'].map((cat) => (
-                              <li key={cat}>
-                                <button 
-                                  className="dropdown-item py-3 px-3" 
-                                  type="button" 
-                                  onClick={() => setCategoriaSelecionada(cat)}
-                                  style={{ 
-                                    fontSize: '1rem',
-                                    borderRadius: '6px',
-                                    color: categoriaSelecionada === cat ? '#a91b60' : '#212529',
-                                    fontWeight: categoriaSelecionada === cat ? '800' : '500',
-                                    backgroundColor: categoriaSelecionada === cat ? '#ffd6e7 ' : 'transparent',
-                                    transition: 'all 0.2s',
-                                  }}
-                                >
-                                  {cat}
-                                </button>
-                              </li>
-                            ))}
-                          </ul>
+                      
+                      {/* CATEGORIAS COLORIDAS */}
+                      <div className="w-100 mt-4 mb-4">
+
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <div>
+                            <h5 className="fw-bold mb-1" style={{ color: '#5d4037' }}>
+                              Encontre o que você precisa ✨
+                            </h5>
+                            <p className="text-muted small mb-0">
+                              Explore nossos serviços e comércios
+                            </p>
+                          </div>
                         </div>
+
+                        {(() => {
+                          const coresCategorias = [
+                            { fundo: '#FFF0F3', icone: '#E75480' },
+                            { fundo: '#FFF3E0', icone: '#F39C12' },
+                            { fundo: '#F3E8FF', icone: '#9B59B6' },
+                            { fundo: '#E3F2FD', icone: '#3498DB' },
+                            { fundo: '#E8F5E9', icone: '#27AE60' },
+                            { fundo: '#FFF8E1', icone: '#F1C40F' },
+                            { fundo: '#FCE4EC', icone: '#EC407A' },
+                            { fundo: '#E0F7FA', icone: '#00ACC1' },
+                            { fundo: '#FBE9E7', icone: '#FF7043' },
+                            { fundo: '#EDE7F6', icone: '#7E57C2' },
+                            { fundo: '#F1F8E9', icone: '#8BC34A' },
+                            { fundo: '#E8EAF6', icone: '#5C6BC0' }
+                          ];
+
+                          const categoriasVisiveis = categoriasExpandidas
+                            ? categorias
+                            : categorias.slice(0, 6);
+
+                          return (
+                            <>
+                              <div
+                                className="d-grid gap-2"
+                                style={{
+                                  gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 2fr))'
+                                }}
+                              >
+                                {categoriasVisiveis.map((categoria, index) => {
+                                  const cores = coresCategorias[index % coresCategorias.length];
+                                  const selecionada =
+                                    categoriaSelecionada === categoria.nome;
+
+                                  return (
+                                    <button
+                                      key={categoria.nome}
+                                      type="button"
+                                      onClick={() =>
+                                        setCategoriaSelecionada(categoria.nome)
+                                      }
+                                      className="border-0 d-flex flex-column align-items-center justify-content-center"
+                                      style={{
+                                        backgroundColor: selecionada
+                                          ? cores.icone
+                                          : cores.fundo,
+                                        color: selecionada ? '#fff' : '#5d4037',
+                                        borderRadius: '18px',
+                                        padding: '10px 5px',
+                                        minHeight: '85px',
+                                        boxShadow: selecionada
+                                          ? '0 4px 12px rgba(0,0,0,0.15)'
+                                          : '0 2px 6px rgba(0,0,0,0.04)',
+                                        transition: 'all 0.25s ease',
+                                        cursor: 'pointer'
+                                      }}
+                                    >
+                                      {categoria.nome === 'Pet & Animais' ? (
+                                        <svg
+                                          width="34"
+                                          height="34"
+                                          viewBox="0 0 64 64"
+                                          style={{ marginBottom: '9px' }}
+                                        >
+                                          <g
+                                            fill={selecionada ? '#fff' : cores.icone}
+                                            stroke={selecionada ? '#fff' : cores.icone}
+                                            strokeWidth="1.5"
+                                          >
+                                            <ellipse cx="14" cy="25" rx="7" ry="9" />
+                                            <ellipse cx="27" cy="15" rx="7" ry="9" />
+                                            <ellipse cx="40" cy="15" rx="7" ry="9" />
+                                            <ellipse cx="51" cy="25" rx="7" ry="9" />
+
+                                            <path
+                                              d="M32 30
+                                                C25 30 19 39 19 46
+                                                C19 53 25 56 32 56
+                                                C39 56 45 53 45 46
+                                                C45 39 39 30 32 30 Z"
+                                              strokeLinejoin="round"
+                                            />
+                                          </g>
+                                        </svg>
+                                      ) : (
+                                        <i
+                                          className={`bi ${categoria.icone}`}
+                                          style={{
+                                            fontSize: '1.5rem',
+                                            marginBottom: '6px',
+                                            color: selecionada ? '#fff' : cores.icone
+                                          }}
+                                        ></i>
+                                      )}
+
+                                      <span
+                                        className="text-center fw-semibold"
+                                        style={{
+                                          fontSize: '0.72rem',
+                                          lineHeight: '1.25'
+                                        }}
+                                      >
+                                        {categoria.nome}
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+                              </div>
+
+                              {categorias.length > 6 && (
+                                <div className="text-center mt-3">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setCategoriasExpandidas(!categoriasExpandidas)
+                                    }
+                                    className="btn rounded-pill px-4 py-2"
+                                    style={{
+                                      backgroundColor: '#FFF0F6',
+                                      color: '#D63384',
+                                      border: '1px solid #F8C8DE',
+                                      fontWeight: '600'
+                                    }}
+                                  >
+                                    {categoriasExpandidas ? (
+                                      <>
+                                        <i className="bi bi-chevron-up me-2"></i>
+                                        Ver menos
+                                      </>
+                                    ) : (
+                                      <>
+                                        <i className="bi bi-three-dots me-2"></i>
+                                        Ver mais categorias
+                                      </>
+                                    )}
+                                  </button>
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
                       </div>
+
                     </div>
                   </div>
                 </div>

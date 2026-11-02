@@ -65,39 +65,78 @@ function Cadastro() {
     .replace(/--+/g, '-');    // Remove hífens duplicados
 };
 
+// GERAR LINK AUTOMÁTICO DO WHATSAPP
+const gerarLinkWhatsApp = (telefone) => {
+  if (!telefone?.trim()) return null;
+
+  const numero = telefone.replace(/\D/g, "");
+
+  // Adiciona o código do Brasil, caso não esteja informado
+  const numeroCompleto = numero.startsWith("55")
+    ? numero
+    : `55${numero}`;
+
+  const mensagem = "Olá! Vim pelo Hub Serviços e gostaria de mais informações.";
+
+  return `https://wa.me/${numeroCompleto}?text=${encodeURIComponent(mensagem)}`;
+};
+
+
+// GERAR LINK AUTOMÁTICO DO INSTAGRAM
+const gerarLinkInstagram = (perfil) => {
+  if (!perfil?.trim()) return null;
+
+  const usuario = perfil
+    .trim()
+    .replace(/^https?:\/\/(www\.)?instagram\.com\//i, "")
+    .replace(/^@/, "")
+    .split(/[/?#]/)[0];
+
+  return usuario
+    ? `https://www.instagram.com/${usuario}/`
+    : null;
+};
+
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-  // Validação da senha somente para o plano Gold
-  if (formData.plano === 'gold') {
-    if (formData.senha !== formData.confirmarSenha) {
-      alert('As senhas não coincidem.');
-      return;
-    }
+  
+  // VALIDAÇÃO DA SENHA PARA TODOS OS PLANOS
+  if (formData.senha !== formData.confirmarSenha) {
+    alert('As senhas não coincidem.');
+    return;
+  }
 
-    if (formData.senha.length < 6) {
-      alert('A senha deve ter pelo menos 6 caracteres.');
-      return;
-    }
+  if (formData.senha.length < 6) {
+    alert('A senha deve ter pelo menos 6 caracteres.');
+    return;
   }
 
   let userId = null;
 
   try {
-    // 1. CRIAR CONTA DO LOJISTA NO SUPABASE AUTH
-      if (formData.plano === 'gold') {
-        const { data, error: authError } = await supabase.auth.signUp({
-          email: formData.email,
-          password: formData.senha,
-        });
+    
+    // 1. CRIAR CONTA DO LOJISTA PARA TODOS OS PLANOS
+    // 1. CRIAR CONTA DO LOJISTA PARA TODOS OS PLANOS
+const { data, error: authError } = await supabase.auth.signUp({
+  email: formData.email.trim(),
+  password: formData.senha,
+  options: {
+    emailRedirectTo: `${window.location.origin}/login-lojista`,
+  },
+});
 
-        if (authError) {
-          alert(authError.message);
-          return;
-        }
+    if (authError) {
+      alert(authError.message);
+      return;
+    }
 
-        userId = data.user?.id;
-      }
+    userId = data.user?.id;
+
+    if (!userId) {
+      alert("Não foi possível criar sua conta. Tente novamente.");
+      return;
+    }
 
     // 2. UPLOAD DAS IMAGENS
     const logoUrl = logoFile ? await uploadImage(logoFile) : null;
@@ -126,9 +165,9 @@ const handleSubmit = async (e) => {
           bairro: formData.bairro,
           plano: formData.plano,
           descricao: formData.descricao,
-          link: (formData.plano === 'premium' || formData.plano === 'gold') ? formData.link : null,
-          whatsapp: formData.whatsapp,
-          instagram: formData.instagram,
+          link: formData.plano === 'premium' ? formData.link : null,
+          whatsapp: gerarLinkWhatsApp(formData.whatsapp),
+          instagram: gerarLinkInstagram(formData.instagram),
           imagem: logoUrl,
           imagem2: img2,
           imagem3: img3,
@@ -199,9 +238,9 @@ const handleSubmit = async (e) => {
           />
         </div>
 
-        {/* DADOS DE ACESSO - SOMENTE GOLD */}
-        {formData.plano === 'gold' && (
-          <>
+        {/* DADOS DE ACESSO PARA TODOS OS PLANOS */}
+            <>
+        
             <div className="col-md-3">
               <label className="form-label fw-bold small text-uppercase text-secondary">
                 Senha
@@ -260,7 +299,7 @@ const handleSubmit = async (e) => {
               </div>
             </div>
           </>
-        )}
+        
             {/* TIPO DE NEGÓCIO */}
             <div className="col-md-6">
               <label className="form-label fw-bold small text-uppercase text-secondary">Tipo de Negócio</label>
@@ -512,19 +551,49 @@ const handleSubmit = async (e) => {
             </div>
           )}
 
-          {/* SE FOR GRATUITO */}
-          {formData.plano === 'free' && (
-            <div className="row g-3 mb-4 animate__animated animate__fadeIn">
-               <div className="col-md-6">
-                <label className="form-label fw-bold small text-uppercase text-success">Link do WhatsApp</label>
-                <input type="text" name="whatsapp" className="form-control rounded-4 shadow-sm" placeholder="https://wa.me/seu-numero" value={formData.whatsapp} onChange={handleChange} />
-              </div>
-              <div className="col-md-6">
-                <label className="form-label fw-bold small text-uppercase text-danger">Link do Instagram</label>
-                <input type="text" name="instagram" className="form-control rounded-4 shadow-sm" placeholder="https://instagram.com/seu-perfil" value={formData.instagram} onChange={handleChange} />
-              </div>
+          
+          {/* CONTATOS PARA TODOS OS PLANOS */}
+          <div className="row g-3 mb-4">
+
+            <div className="col-md-6">
+              <label className="form-label fw-bold small text-uppercase text-success">
+                WhatsApp com DDD
+              </label>
+
+              <input
+                type="tel"
+                name="whatsapp"
+                className="form-control rounded-4 shadow-sm"
+                placeholder="Ex: (11) 99999-9999"
+                value={formData.whatsapp}
+                onChange={handleChange}
+              />
+
+              <small className="text-muted">
+                Informe seu número com DDD.
+              </small>
             </div>
-          )}
+
+            <div className="col-md-6">
+              <label className="form-label fw-bold small text-uppercase text-danger">
+                Instagram
+              </label>
+
+              <input
+                type="text"
+                name="instagram"
+                className="form-control rounded-4 shadow-sm"
+                placeholder="Ex: @nomedaloja"
+                value={formData.instagram}
+                onChange={handleChange}
+              />
+
+              <small className="text-muted">
+                Informe apenas o nome do perfil ou @.
+              </small>
+            </div>
+
+          </div>
 
           <div className="mb-4">
             <label className="form-label fw-bold small text-uppercase text-secondary">Logotipo Principal / Imagem de Capa (Obrigatório)</label>
