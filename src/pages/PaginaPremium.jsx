@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
 function PaginaPremium() {
   const { slug } = useParams();
+  const [searchParams] = useSearchParams();
+  const origemEdicao = searchParams.get("origem") === "edicao";
+  const origemCentral = searchParams.get("origem") === "central";
 
   const [loja, setLoja] = useState(null);
   const [carregando, setCarregando] = useState(true);
@@ -159,7 +162,13 @@ const configuracao =
   <main className="container py-4 py-md-5">
     <div className="mb-3">
         <Link
-            to="/"
+            to={
+            origemEdicao
+                ? "/painel/lojista/editar-premium"
+                : origemCentral
+                ? "/painel/lojista"
+                : "/"
+            }
             className="btn rounded-pill px-3"
             style={{
             color: "#d63384",
@@ -168,7 +177,12 @@ const configuracao =
             }}
         >
             <i className="bi bi-arrow-left me-2"></i>
-            Voltar ao Hub Serviços
+
+            {origemEdicao
+            ? "Voltar para edição"
+            : origemCentral
+            ? "Voltar à Central do Lojista"
+            : "Voltar ao Hub Serviços"}
         </Link>
         </div>
 

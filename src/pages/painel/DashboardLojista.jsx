@@ -124,10 +124,17 @@ const handleLogout = async () => {
                 </p>
 
                 <button
-                    type="button"
-                    className="btn btn-primary rounded-3"
+                type="button"
+                className="btn btn-primary rounded-3"
+                onClick={() => {
+                    if (lojista?.plano === "premium") {
+                    navigate("/painel/lojista/editar-premium");
+                    } else {
+                    alert("A edição específica deste plano será disponibilizada em breve.");
+                    }
+                }}
                 >
-                    Gerenciar
+                Gerenciar
                 </button>
             </div>
         </div>
@@ -157,7 +164,7 @@ const handleLogout = async () => {
                         }
 
                         if (lojista.plano === "premium") {
-                        navigate(`/lojista-premium/${lojista.slug}`);
+                        navigate(`/lojista-premium/${lojista.slug}?origem=central`);
                         } else if (lojista.plano === "gold") {
                         navigate(`/lojista/${lojista.slug}`);
                         } else {
