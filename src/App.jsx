@@ -7,6 +7,9 @@ import Cardapio from './pages/Cardapio';
 import Favoritos from './pages/Favoritos';
 import Sobre from './pages/Sobre';
 import PaginaPremium from './pages/PaginaPremium';
+
+import AprovacoesAdmin from './pages/AprovacoesAdmin';
+
 import EditarPaginaPremium from './pages/painel/EditarPaginaPremium';
 
 import LoginLojista from './pages/painel/LoginLojista';
@@ -26,13 +29,23 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/cadastro" element={<Cadastro />} />
         <Route path="/lojista/:slug" element={<Cardapio />} />
-        <Route path="/lojista-premium/:slug"element={<PaginaPremium />}/>
-        <Route path="/painel/lojista/editar-premium" element={<EditarPaginaPremium />}/>
+
+        <Route
+          path="/lojista-premium/:slug"
+          element={<PaginaPremium />}
+        />
+
+        <Route
+          path="/painel/lojista/editar-premium"
+          element={<EditarPaginaPremium />}
+        />
+
         <Route path="/sobre" element={<Sobre />} />
         <Route path="/favoritos" element={<Favoritos />} />
 
         <Route path="/login-lojista" element={<LoginLojista />} />
         <Route path="/painel/lojista" element={<DashboardLojista />} />
+
         <Route
           path="/painel/admin"
           element={
@@ -41,6 +54,16 @@ function App() {
             </ProtecaoAdmin>
           }
         />
+
+        <Route
+          path="/painel/admin/aprovacoes"
+          element={
+            <ProtecaoAdmin>
+              <AprovacoesAdmin />
+            </ProtecaoAdmin>
+          }
+        />
+
         <Route path="/redefinir-senha" element={<RedefinirSenha />} />
         <Route path="/login-admin" element={<LoginAdmin />} />
       </Routes>

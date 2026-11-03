@@ -1,9 +1,16 @@
 import {useEffect, useState} from "react";
 import { supabase } from "../../supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 function DashboardAdmin() {
   const [totalEmpresas, setTotalEmpresas] = useState(0);
   const [totalPendentes, setTotalPendentes] = useState(0);
+  const navigate = useNavigate();
+
+  const sair = async () => {
+  await supabase.auth.signOut();
+  navigate("/");
+};
 
 
   useEffect(() => {
@@ -209,16 +216,19 @@ function DashboardAdmin() {
                 Analise os cadastros que estão aguardando aprovação.
               </p>
 
-              <button
-                type="button"
-                className="btn rounded-3 fw-semibold"
-                style={{
+              
+          <button
+              type="button"
+              className="btn rounded-3 fw-semibold"
+              style={{
                   backgroundColor: '#d63384',
                   color: '#fff'
-                }}
-              >
-                Ver pendentes
-              </button>
+              }}
+              onClick={() => navigate("/painel/admin/aprovacoes")}
+          >
+              Ver pendentes
+          </button>
+
 
             </div>
           </div>
@@ -399,18 +409,19 @@ function DashboardAdmin() {
       </div>
 
 
-      {/* RODAPÉ / SAIR */}
-      <div className="container text-end">
+      
+    {/* RODAPÉ / SAIR */}
+    <div className="container text-end">
+      <button
+        type="button"
+        className="btn btn-outline-danger rounded-3"
+        onClick={sair}
+      >
+        <i className="bi bi-box-arrow-right me-2"></i>
+        Sair
+      </button>
+    </div>
 
-        <button
-          type="button"
-          className="btn btn-outline-danger rounded-3"
-        >
-          <i className="bi bi-box-arrow-right me-2"></i>
-          Sair
-        </button>
-
-      </div>
 
     </div>
   );
