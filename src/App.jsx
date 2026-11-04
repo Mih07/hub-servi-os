@@ -9,6 +9,8 @@ import Sobre from './pages/Sobre';
 import PaginaPremium from './pages/PaginaPremium';
 
 import AprovacoesAdmin from './pages/AprovacoesAdmin';
+import EmpresasAdmin from './pages/painel/EmpresasAdmin';
+import EstatisticasAdmin from './pages/painel/EstatisticasAdmin';
 import ModeracaoAvaliacoes from './pages/painel/ModeracaoAvaliacoes';
 
 import EditarPaginaPremium from './pages/painel/EditarPaginaPremium';
@@ -55,6 +57,25 @@ function App() {
             </ProtecaoAdmin>
           }
         />
+        
+        <Route
+          path="/painel/admin/estatisticas"
+          element={
+            <ProtecaoAdmin>
+              <EstatisticasAdmin />
+            </ProtecaoAdmin>
+          }
+        />
+        
+        <Route
+          path="/painel/admin/empresas"
+          element={
+            <ProtecaoAdmin>
+              <EmpresasAdmin />
+            </ProtecaoAdmin>
+          }
+        />
+
 
         <Route
           path="/painel/admin/moderacao-avaliacoes"

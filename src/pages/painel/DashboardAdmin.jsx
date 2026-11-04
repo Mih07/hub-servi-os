@@ -242,6 +242,7 @@ function DashboardAdmin() {
                   backgroundColor: '#d63384',
                   color: '#fff'
                 }}
+                onClick={() => navigate("/painel/admin/empresas")}
               >
                 Gerenciar empresas
               </button>
@@ -335,8 +336,7 @@ function DashboardAdmin() {
 
               <p className="text-secondary mb-4">
                 Escolha quais negócios aparecerão no Top do Hub.
-              </p>
-
+              </p>              
               <button
                 type="button"
                 className="btn rounded-3 fw-semibold"
@@ -344,9 +344,11 @@ function DashboardAdmin() {
                   backgroundColor: '#d63384',
                   color: '#fff'
                 }}
+                onClick={() => navigate("/painel/admin/empresas")}
               >
                 Gerenciar destaques
               </button>
+
 
             </div>
           </div>
@@ -400,16 +402,19 @@ function DashboardAdmin() {
                 Acompanhe os acessos e interações dos negócios.
               </p>
 
-              <button
-                type="button"
-                className="btn rounded-3 fw-semibold"
-                style={{
-                  backgroundColor: '#d63384',
-                  color: '#fff'
-                }}
-              >
-                Ver estatísticas
-              </button>
+              
+            <button
+              type="button"
+              className="btn rounded-3 fw-semibold"
+              style={{
+                backgroundColor: '#d63384',
+                color: '#fff'
+              }}
+              onClick={() => navigate("/painel/admin/estatisticas")}
+            >
+              Ver estatísticas
+            </button>
+
 
             </div>
           </div>
