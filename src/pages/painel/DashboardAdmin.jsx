@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 function DashboardAdmin() {
   const [totalEmpresas, setTotalEmpresas] = useState(0);
   const [totalPendentes, setTotalPendentes] = useState(0);
+  const [totalAvaliacoesPendentes, setTotalAvaliacoesPendentes] = useState(0);
   const navigate = useNavigate();
 
   const sair = async () => {
@@ -26,23 +27,43 @@ function DashboardAdmin() {
 
       setTotalEmpresas(count || 0);
     };
+
     const buscarTotalPendentes = async () => {
-    const { count, error } = await supabase
-      .from("servicos")
-      .select("*", { count: "exact", head: true })
-      .eq("aprovado", false);
+      const { count, error } = await supabase
+        .from("servicos")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pendente");
 
-    if (error) {
-      console.error("Erro ao buscar empresas pendentes:", error);
-      return;
-    }
+      if (error) {
+        console.error("Erro ao buscar empresas pendentes:", error);
+        return;
+      }
 
-    setTotalPendentes(count || 0);
-  };
+      setTotalPendentes(count || 0);
+    };
 
+    // COLE A FUNÇÃO AQUI
+    const buscarTotalAvaliacoesPendentes = async () => {
+      const { count, error } = await supabase
+        .from("avaliacoes")
+        .select("*", { count: "exact", head: true })
+        .eq("aprovado", false);
+
+      if (error) {
+        console.error("Erro ao buscar avaliações pendentes:", error);
+        return;
+      }
+
+      setTotalAvaliacoesPendentes(count || 0);
+    };
+
+    // CHAMADAS
     buscarTotalEmpresas();
     buscarTotalPendentes();
-  }, []);
+    buscarTotalAvaliacoesPendentes();
+
+    }, []);
+
 
 
 
@@ -73,10 +94,39 @@ function DashboardAdmin() {
 
         </div>
       </div>
+      
 
 
       {/* RESUMO */}
       <div className="container mb-5">
+
+        {/* ALERTA ADMINISTRATIVO */}
+        {(totalPendentes > 0 || totalAvaliacoesPendentes > 0) && (
+          <div className="container mb-4">
+            <div className="alert alert-warning border-0 shadow-sm rounded-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+
+              <div>
+                <h5 className="fw-bold mb-1">
+                  🔔 Você tem tarefas aguardando sua atenção!
+                </h5>
+
+                <p className="mb-0">
+                  {totalPendentes} negócio(s) aguardando aprovação e{" "}
+                  {totalAvaliacoesPendentes} avaliação(ões) aguardando moderação.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-dark rounded-3"
+                onClick={() => navigate("/painel/admin/aprovacoes")}
+              >
+                Analisar cadastros
+              </button>
+
+            </div>
+          </div>
+        )}
 
         <h4 className="fw-bold mb-4">
           Visão geral
@@ -233,6 +283,43 @@ function DashboardAdmin() {
             </div>
           </div>
 
+        {/* MODERAÇÃO DE AVALIAÇÕES */}
+        <div className="col-md-6 col-lg-4">
+          <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
+
+            <div className="fs-1 mb-3">
+              💬
+            </div>
+
+            <h5 className="fw-bold">
+              Moderação de Avaliações
+            </h5>
+
+            <p className="text-secondary mb-2">
+              Analise os comentários enviados pelos clientes do Hub Serviços.
+            </p>
+
+            <p className="fw-semibold mb-4">
+              {totalAvaliacoesPendentes} avaliação(ões) pendente(s)
+            </p>
+
+            <button
+              type="button"
+              className="btn rounded-3 fw-semibold"
+              style={{
+                backgroundColor: "#d63384",
+                color: "#fff"
+              }}
+              onClick={() =>
+                navigate("/painel/admin/moderacao-avaliacoes")
+              }
+            >
+              Moderar avaliações
+            </button>
+
+          </div>
+        </div>  
+
 
           {/* DESTAQUES */}
           <div className="col-md-6 col-lg-4">
@@ -263,6 +350,7 @@ function DashboardAdmin() {
 
             </div>
           </div>
+          
 
 
           {/* PLANOS */}

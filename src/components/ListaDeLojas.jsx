@@ -266,9 +266,9 @@ export default function ListaDeLojas({
               ></i>
             ))}
             <span className="text-muted small ms-1">
-                {loja.nota_media > 0 
-                ? `(${parseFloat(loja.nota_media).toFixed(1)} estrelas)` 
-                : '(Avalie)'}
+              {loja.total_avaliacoes > 0
+                ? `(${parseFloat(loja.nota_media).toFixed(1).replace(".", ",")} • ${loja.total_avaliacoes} avaliações)`
+                : "(Seja o primeiro a avaliar)"}
             </span>
           </div>
                   <p className="text-muted small mb-2">{loja.categoria} • {loja.regiao}</p>

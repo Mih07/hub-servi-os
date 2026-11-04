@@ -9,6 +9,7 @@ import Sobre from './pages/Sobre';
 import PaginaPremium from './pages/PaginaPremium';
 
 import AprovacoesAdmin from './pages/AprovacoesAdmin';
+import ModeracaoAvaliacoes from './pages/painel/ModeracaoAvaliacoes';
 
 import EditarPaginaPremium from './pages/painel/EditarPaginaPremium';
 
@@ -51,6 +52,15 @@ function App() {
           element={
             <ProtecaoAdmin>
               <DashboardAdmin />
+            </ProtecaoAdmin>
+          }
+        />
+
+        <Route
+          path="/painel/admin/moderacao-avaliacoes"
+          element={
+            <ProtecaoAdmin>
+              <ModeracaoAvaliacoes />
             </ProtecaoAdmin>
           }
         />
