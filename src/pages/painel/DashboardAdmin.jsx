@@ -371,16 +371,19 @@ function DashboardAdmin() {
                 Visualize e gerencie os planos Free, Premium e Gold.
               </p>
 
-              <button
-                type="button"
-                className="btn rounded-3 fw-semibold"
-                style={{
-                  backgroundColor: '#d63384',
-                  color: '#fff'
-                }}
-              >
-                Gerenciar planos
-              </button>
+              
+            <button
+              type="button"
+              className="btn rounded-3 fw-semibold"
+              style={{
+                backgroundColor: '#d63384',
+                color: '#fff'
+              }}
+              onClick={() => navigate("/painel/admin/planos")}
+            >
+              Gerenciar planos
+            </button>
+
 
             </div>
           </div>
