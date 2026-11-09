@@ -100,8 +100,7 @@ const gerarLinkInstagram = (perfil) => {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-  
-  // VALIDAÇÃO DA SENHA PARA TODOS OS PLANOS
+
   if (formData.senha !== formData.confirmarSenha) {
     alert('As senhas não coincidem.');
     return;
@@ -112,52 +111,34 @@ const handleSubmit = async (e) => {
     return;
   }
 
-  let userId = null;
+  if (!logoFile) {
+    alert('Selecione a imagem/logo da sua empresa.');
+    return;
+  }
 
   try {
-    
+    // 1. Fazer upload das imagens antes de criar a conta
+    const logoUrl = await uploadImage(logoFile);
+    const img2 = fotoExtra1 ? await uploadImage(fotoExtra1) : null;
+    const img3 = fotoExtra2 ? await uploadImage(fotoExtra2) : null;
 
-    // 1. CRIAR CONTA DO LOJISTA PARA TODOS OS PLANOS
+    // 2. Gerar slug
+    const slugGerado = gerarSlug(formData.nome);
+
+    // 3. Criar conta enviando os dados da empresa nos metadados
     const { data, error: authError } = await supabase.auth.signUp({
       email: formData.email.trim(),
       password: formData.senha,
       options: {
         emailRedirectTo: `${window.location.origin}/login-lojista?confirmado=1`,
-      },
-    });
 
-    if (authError) {
-      alert(authError.message);
-      return;
-    }
-
-    userId = data.user?.id;
-
-    if (!userId) {
-      alert("Não foi possível criar sua conta. Tente novamente.");
-      return;
-    }
-
-    // 2. UPLOAD DAS IMAGENS
-    const logoUrl = logoFile ? await uploadImage(logoFile) : null;
-    const img2 = fotoExtra1 ? await uploadImage(fotoExtra1) : null;
-    const img3 = fotoExtra2 ? await uploadImage(fotoExtra2) : null;
-
-    // 2. GERAR O SLUG A PARTIR DO NOME
-    const slugGerado = gerarSlug(formData.nome);
-
-    // 3. SALVAR NO SUPABASE (Incluindo o slug!)
-    const { error } = await supabase
-      .from('servicos')
-      .insert([
-        {
-          user_id: userId,
+        data: {
           nome: formData.nome,
           tipo_negocio: formData.tipo_negocio,
-          slug: slugGerado, 
+          slug: slugGerado,
           categoria: formData.categoria,
           outraCategoria:
-            formData.categoria === 'Outra'
+            formData.categoria === 'Outras Categorias'
               ? formData.outraCategoria
               : null,
           regiao: formData.regiao,
@@ -172,18 +153,32 @@ const handleSubmit = async (e) => {
           imagem2: img2,
           imagem3: img3,
         },
-      ]);
+      },
+    });
 
-    if (error) throw error;
+    if (authError) {
+      alert(authError.message);
+      return;
+    }
 
-    alert(`Sucesso! A loja "${formData.nome}" foi cadastrada.`);
+    if (!data.user?.id) {
+      alert('Não foi possível criar sua conta. Tente novamente.');
+      return;
+    }
+
+    alert(
+      `Cadastro de "${formData.nome}" enviado com sucesso! Confirme seu e-mail.`
+    );
+
     navigate('/');
-
   } catch (error) {
-    console.error('Erro ao cadastrar no Supabase:', error.message);
-    alert('Erro ao salvar: ' + error.message); // Exibe o erro real para debug
+    console.error('Erro ao cadastrar no Supabase:', error);
+
+    alert('Erro ao cadastrar: ' + error.message);
   }
 };
+
+  
 
   return (
     <div className="container my-5 animate__animated animate__fadeIn" style={{ maxWidth: '850px' }}>
