@@ -203,17 +203,20 @@ function EditarPaginaPremium() {
         atualizacoes.imagem3 = await enviarImagem(foto2File);
       }
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("servicos")
         .update(atualizacoes)
         .eq("id", lojista.id)
-        .eq("user_id", userId)
-        .select()
-        .single();
+        .eq("user_id", userId);
 
       if (error) throw error;
 
-      setLojista(data);
+      setLojista((prev) => ({
+        ...prev,
+        ...atualizacoes,
+      }));
+
+      
       setLogoFile(null);
       setFoto1File(null);
       setFoto2File(null);
