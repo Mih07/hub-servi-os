@@ -261,7 +261,9 @@ export default function ListaDeLojas({
                 onClick={() => {
                   // 1. Atualiza o estado visual instantaneamente para o usuário
                   setNotas(prev => ({ ...prev, [loja.id]: estrela }));
-                  // 2. Chama a função que envia para o Supabase
+                  // Registra a interação no painel de estatísticas
+                  registrarClique(loja.id, "avaliacao");
+                  // Chama a função que envia a nota para o Supabase
                   registrarAvaliacao(loja.id, estrela);
                 }}
                 onMouseEnter={() => setHover({ lojaId: loja.id, nota: estrela })}
@@ -333,12 +335,16 @@ export default function ListaDeLojas({
                       type="button"
                       className="btn btn-link btn-sm p-0 text-decoration-none"
                       style={{ color: "#d63384", fontSize: "0.8rem" }}
-                      onClick={() =>
+                      onClick={() => {
+                        registrarClique(
+                          loja.id,
+                          descricoesExpandidas[loja.id] ? "ver_menos" : "ver_mais"
+                        );
                         setDescricoesExpandidas((prev) => ({
                           ...prev,
                           [loja.id]: !prev[loja.id],
-                        }))
-                      }
+                        }));
+                      }}
                     >
                       {descricoesExpandidas[loja.id] ? "Ver menos" : "Ver mais"}
                     </button>
@@ -346,10 +352,10 @@ export default function ListaDeLojas({
                 )}
                   
                   <div className="d-flex gap-2 mb-3">
-                    <button onClick={() => toggleFavorito(loja.id)} className="btn btn-sm btn-outline-secondary rounded-circle border-0" style={{ width: '35px', height: '35px', color: favoritos.includes(loja.id) ? '#d63384' : '#6c757d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <button onClick={() => { registrarClique(loja.id, "favorito"); toggleFavorito(loja.id); }} className="btn btn-sm btn-outline-secondary rounded-circle border-0" style={{ width: '35px', height: '35px', color: favoritos.includes(loja.id) ? '#d63384' : '#6c757d', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {favoritos.includes(loja.id) ? <AiFillHeart size={20} /> : <AiOutlineHeart size={20} />}
                     </button>
-                    <button onClick={() => { navigator.clipboard.writeText(window.location.href); alert("Link copiado!"); }} className="btn btn-sm btn-outline-secondary rounded-circle border-0" style={{ width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <button onClick={() => { registrarClique(loja.id, "compartilhamento"); navigator.clipboard.writeText(window.location.href); alert("Link copiado!"); }} className="btn btn-sm btn-outline-secondary rounded-circle border-0" style={{ width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <AiOutlineShareAlt size={20} />
                     </button>
                   </div>
