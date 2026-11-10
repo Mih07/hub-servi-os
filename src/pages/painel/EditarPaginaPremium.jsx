@@ -19,6 +19,7 @@ function EditarPaginaPremium() {
     regiao: "",
     endereco: "",
     bairro: "",
+    formas_atendimento: [],
     descricao: "",
     whatsapp: "",
     instagram: "",
@@ -90,6 +91,7 @@ function EditarPaginaPremium() {
           regiao: data.regiao || "",
           endereco: data.endereco || "",
           bairro: data.bairro || "",
+          formas_atendimento: data.formas_atendimento || [],
           descricao: data.descricao || "",
           whatsapp: extrairTelefone(data.whatsapp),
           instagram: extrairInstagram(data.instagram),
@@ -185,6 +187,7 @@ function EditarPaginaPremium() {
         regiao: formData.regiao.trim(),
         endereco: formData.endereco.trim(),
         bairro: formData.bairro.trim(),
+        formas_atendimento: formData.formas_atendimento,
         descricao: formData.descricao.trim(),
         whatsapp: gerarLinkWhatsApp(formData.whatsapp),
         instagram: gerarLinkInstagram(formData.instagram),
@@ -203,18 +206,29 @@ function EditarPaginaPremium() {
         atualizacoes.imagem3 = await enviarImagem(foto2File);
       }
 
-      const { error } = await supabase
-        .from("servicos")
-        .update(atualizacoes)
-        .eq("id", lojista.id)
-        .eq("user_id", userId);
+      console.log("ID do lojista:", lojista.id);
+      console.log("ID do usuário logado:", userId);
+      console.log("Dados que serão atualizados:", atualizacoes);
 
-      if (error) throw error;
+      
+    const { data: atualizado, error } = await supabase
+      .from("servicos")
+      .update(atualizacoes)
+      .eq("id", lojista.id)
+      .eq("user_id", userId)
+      .select("*")
+      .maybeSingle();
 
-      setLojista((prev) => ({
-        ...prev,
-        ...atualizacoes,
-      }));
+    if (error) throw error;
+
+    if (!atualizado) {
+      throw new Error(
+        "Nenhum registro foi atualizado. Verifique as permissões do Supabase."
+      );
+    }
+
+    setLojista(atualizado);
+
 
       
       setLogoFile(null);
@@ -375,6 +389,53 @@ function EditarPaginaPremium() {
               onChange={handleChange}
             />
           </div>
+
+            <div className="mt-4">
+              <label className="form-label fw-semibold">
+                Forma de atendimento
+              </label>
+
+              <p className="text-secondary small">
+                Selecione como seu negócio atende os clientes.
+              </p>
+
+              {[
+                "Presencial no estabelecimento",
+                "Atendimento no endereço do cliente",
+                "Agendamento",
+                "Home Office",
+                "Online / Remoto",
+              ].map((forma) => (
+                <div className="form-check mb-2" key={forma}>
+                  <input
+                    className="form-check-input"
+                    type="checkbox"
+                    id={`atendimento-${forma}`}
+                    checked={formData.formas_atendimento.includes(forma)}
+                    onChange={(e) => {
+                      const selecionadas = e.target.checked
+                        ? [...formData.formas_atendimento, forma]
+                        : formData.formas_atendimento.filter(
+                            (item) => item !== forma
+                          );
+
+                      setFormData((prev) => ({
+                        ...prev,
+                        formas_atendimento: selecionadas,
+                      }));
+                    }}
+                  />
+
+                  <label
+                    className="form-check-label"
+                    htmlFor={`atendimento-${forma}`}
+                  >
+                    {forma}
+                  </label>
+                </div>
+              ))}
+            </div>
+
         </div>
 
         <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">

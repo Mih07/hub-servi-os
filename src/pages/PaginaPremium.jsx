@@ -983,6 +983,41 @@ const configuracao =
       )}
     </div>
 
+
+    {/* FORMAS DE ATENDIMENTO */}
+    {Array.isArray(loja.formas_atendimento) &&
+      loja.formas_atendimento.length > 0 && (
+        <div className="mb-4">
+          <h5
+            className="fw-bold mb-3"
+            style={{ color: "#5d4037" }}
+          >
+            <i
+              className="bi bi-calendar-check me-2"
+              style={{ color: "#d63384" }}
+            ></i>
+            Forma de atendimento
+          </h5>
+
+          <div className="d-flex flex-wrap gap-2">
+            {loja.formas_atendimento.map((forma, index) => (
+              <span
+                key={index}
+                className="badge rounded-pill px-3 py-2"
+                style={{
+                  backgroundColor: "#fce4ef",
+                  color: "#d63384",
+                  fontSize: "0.85rem",
+                }}
+              >
+                {forma}
+              </span>
+            ))}
+          </div>
+        </div>
+    )}
+
+
     {/* CATEGORIA E ATIVIDADE */}
     <div className="mb-3">
       <h5 className="fw-bold mb-3" style={{ color: "#5d4037" }}>

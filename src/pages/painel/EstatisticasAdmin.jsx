@@ -21,42 +21,45 @@ const meses = [
 ];
 
 
+  async function buscarEstatisticas(mostrarCarregamento = false) {
+    if (mostrarCarregamento) setCarregando(true);
+
+    const [resultadoEstatisticas, resultadoEmpresas] = await Promise.all([
+      supabase
+        .from("estatisticas")
+        .select("id, created_at, loja_id, tipo_clique")
+        .order("created_at", { ascending: false }),
+
+      supabase
+        .from("servicos")
+        .select("id, nome")
+    ]);
+
+    if (resultadoEstatisticas.error) {
+      console.error("Erro ao buscar estatísticas:", resultadoEstatisticas.error);
+    } else {
+      setEstatisticas(resultadoEstatisticas.data || []);
+    }
+
+    if (resultadoEmpresas.error) {
+      console.error("Erro ao buscar empresas:", resultadoEmpresas.error);
+    } else {
+      setEmpresas(resultadoEmpresas.data || []);
+    }
+
+    setCarregando(false);
+  }
+
   useEffect(() => {
-    
-const buscarEstatisticas = async () => {
-  const [resultadoEstatisticas, resultadoEmpresas] = await Promise.all([
-    supabase
-      .from("estatisticas")
-      .select("id, created_at, loja_id, tipo_clique"),
+    buscarEstatisticas(true);
 
-    supabase
-      .from("servicos")
-      .select("id, nome")
-  ]);
+    // Atualiza os dados periodicamente sem precisar recarregar a página.
+    const intervalo = setInterval(() => {
+      buscarEstatisticas(false);
+    }, 30000);
 
-  if (resultadoEstatisticas.error) {
-    console.error(
-      "Erro ao buscar estatísticas:",
-      resultadoEstatisticas.error
-    );
-  } else {
-    setEstatisticas(resultadoEstatisticas.data || []);
-  }
-
-  if (resultadoEmpresas.error) {
-    console.error(
-      "Erro ao buscar empresas:",
-      resultadoEmpresas.error
-    );
-  } else {
-    setEmpresas(resultadoEmpresas.data || []);
-  }
-
-  setCarregando(false);
-};
-buscarEstatisticas();
-
-}, []);
+    return () => clearInterval(intervalo);
+  }, []);
 
 
 const anosDisponiveis = [
@@ -252,12 +255,23 @@ const maiorValorGrafico = Math.max(
             </p>
           </div>
 
-          <button
-            className="btn btn-outline-secondary rounded-3"
-            onClick={() => navigate("/painel/admin")}
-          >
-            ← Voltar ao painel
-          </button>
+          <div className="d-flex flex-wrap gap-2">
+            <button
+              type="button"
+              className="btn btn-outline-primary rounded-3"
+              onClick={() => buscarEstatisticas(true)}
+              disabled={carregando}
+            >
+              {carregando ? "Atualizando..." : "↻ Atualizar dados"}
+            </button>
+
+            <button
+              className="btn btn-outline-secondary rounded-3"
+              onClick={() => navigate("/painel/admin")}
+            >
+              ← Voltar ao painel
+            </button>
+          </div>
         </div>
 
         

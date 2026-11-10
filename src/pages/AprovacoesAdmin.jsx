@@ -110,6 +110,37 @@ function AprovacoesAdmin() {
         setProcessandoId(null);
     }
 
+    async function excluirServico(servico) {
+        const confirmar = window.confirm(
+            `Tem certeza de que deseja excluir o cadastro de "${servico.nome || "este negócio"}"?\\n\\n` +
+            "O cadastro será removido definitivamente da tabela de serviços do Hub. Essa ação não pode ser desfeita."
+        );
+
+        if (!confirmar) return;
+
+        setErro("");
+        setSucesso("");
+        setProcessandoId(servico.id);
+
+        const { error } = await supabase
+            .from("servicos")
+            .delete()
+            .eq("id", servico.id)
+            .eq("status", "reprovado");
+
+        if (error) {
+            console.error("Erro ao excluir serviço reprovado:", error);
+            setErro("Não foi possível excluir o negócio. Verifique as permissões do administrador.");
+            setProcessandoId(null);
+            return;
+        }
+
+        setServicos((prev) => prev.filter((item) => item.id !== servico.id));
+        setSucesso("Cadastro reprovado excluído com sucesso.");
+        await buscarContadores();
+        setProcessandoId(null);
+    }
+
     const abas = [
         {
             status: "pendente",
@@ -346,22 +377,35 @@ function AprovacoesAdmin() {
                                         )}
 
                                         {aba === "reprovado" && (
-                                            <button
-                                                type="button"
-                                                className="btn btn-success w-100 rounded-3"
-                                                disabled={processandoId !== null}
-                                                onClick={() =>
-                                                    mudarStatusServico(
-                                                        servico.id,
-                                                        "reprovado",
-                                                        "aprovado"
-                                                    )
-                                                }
-                                            >
-                                                {processandoId === servico.id
-                                                    ? "Processando..."
-                                                    : "✓ Reaprovar negócio"}
-                                            </button>
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-success w-100 rounded-3"
+                                                    disabled={processandoId !== null}
+                                                    onClick={() =>
+                                                        mudarStatusServico(
+                                                            servico.id,
+                                                            "reprovado",
+                                                            "aprovado"
+                                                        )
+                                                    }
+                                                >
+                                                    {processandoId === servico.id
+                                                        ? "Processando..."
+                                                        : "✓ Reaprovar negócio"}
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    className="btn btn-outline-danger w-100 rounded-3"
+                                                    disabled={processandoId !== null}
+                                                    onClick={() => excluirServico(servico)}
+                                                >
+                                                    {processandoId === servico.id
+                                                        ? "Processando..."
+                                                        : "🗑 Excluir"}
+                                                </button>
+                                            </>
                                         )}
 
                                     </div>

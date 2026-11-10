@@ -15,6 +15,7 @@ function Cadastro() {
     regiao: '', 
     endereco: '',
     bairro: '',
+    formas_atendimento: [],
     descricao: '', // Agora é geral para todo mundo!
     plano: 'free',
     link: '',
@@ -144,6 +145,7 @@ const handleSubmit = async (e) => {
           regiao: formData.regiao,
           endereco: formData.endereco,
           bairro: formData.bairro,
+          formas_atendimento: formData.formas_atendimento,
           plano: formData.plano,
           descricao: formData.descricao,
           link: formData.plano === 'premium' ? formData.link : null,
@@ -214,6 +216,55 @@ const handleSubmit = async (e) => {
             value={formData.nome}
             onChange={handleChange}
           />
+
+
+{/* FORMAS DE ATENDIMENTO */}
+<div className="col-12 mt-3">
+  <label className="form-label fw-bold small text-uppercase text-secondary">
+    Forma de atendimento
+  </label>
+
+  <p className="text-muted small">
+    Selecione uma ou mais opções de atendimento.
+  </p>
+
+  {[
+    "Presencial no estabelecimento",
+    "Atendimento no endereço do cliente",
+    "Agendamento",
+    "Home Office",
+    "Online / Remoto",
+  ].map((forma) => (
+    <div className="form-check mb-2" key={forma}>
+      <input
+        className="form-check-input"
+        type="checkbox"
+        id={`atendimento-${forma}`}
+        checked={formData.formas_atendimento.includes(forma)}
+        onChange={(e) => {
+          const selecionadas = e.target.checked
+            ? [...formData.formas_atendimento, forma]
+            : formData.formas_atendimento.filter(
+                (item) => item !== forma
+              );
+
+          setFormData((prev) => ({
+            ...prev,
+            formas_atendimento: selecionadas,
+          }));
+        }}
+      />
+
+      <label
+        className="form-check-label"
+        htmlFor={`atendimento-${forma}`}
+      >
+        {forma}
+      </label>
+    </div>
+  ))}
+</div>
+
         </div>
 
         {/* DADOS DE ACESSO DO LOJISTA */}

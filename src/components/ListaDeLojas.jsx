@@ -134,10 +134,13 @@ export default function ListaDeLojas({
                           }}
                           onClick={() => {
                             if (loja.plano === "premium") {
+                              registrarClique(loja.id, "perfil_premium");
                               navigate(`/lojista-premium/${loja.slug}`);
                             } else if (loja.plano === "gold") {
+                              registrarClique(loja.id, "catalogo");
                               navigate(`/lojista/${loja.slug}`);
                             } else {
+                              registrarClique(loja.id, "perfil_premium");
                               navigate(`/lojista-premium/${loja.slug}`);
                             }
                           }}
@@ -277,11 +280,36 @@ export default function ListaDeLojas({
                       <i className="bi bi-geo-alt-fill me-1"></i> {loja.endereco}
                     </p>
                   )}
+                  
                   {loja.bairro && (
                     <p className="text-muted small mb-2">
                       <i className="bi bi-house-door-fill me-1"></i> {loja.bairro}
                     </p>
                   )}
+
+
+                    {/* FORMAS DE ATENDIMENTO NO CARD */}
+                    {Array.isArray(loja.formas_atendimento) &&
+                      loja.formas_atendimento.length > 0 && (
+                        <div className="d-flex flex-wrap gap-1 mb-2">
+                          {loja.formas_atendimento.map((forma, index) => (
+                            <span
+                              key={index}
+                              className="badge rounded-pill"
+                              style={{
+                                backgroundColor: "#fce4ef",
+                                color: "#d63384",
+                                fontSize: "0.7rem",
+                                fontWeight: "500",
+                                padding: "6px 9px",
+                              }}
+                            >
+                              {forma}
+                            </span>
+                          ))}
+                        </div>
+                    )}
+
                   
                   {loja.descricao && (
                   <div className="mb-2">
