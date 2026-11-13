@@ -177,6 +177,33 @@ const handleLogout = async () => {
             </div>
         </div>
 
+        {/* MEU PLANO E INVESTIMENTO */}
+        <div className="col-md-6 col-lg-4">
+            <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
+                <div className="fs-1 mb-3">
+                    💳
+                </div>
+
+                <h5 className="fw-bold">
+                    Meu plano e investimento
+                </h5>
+
+                <p className="text-secondary mb-3">
+                    Consulte seu plano, pagamentos, vencimentos e histórico.
+                    Conheça também as opções para mudar de plano.
+                </p>
+
+                <button
+                    type="button"
+                    className="btn btn-primary rounded-3"
+                    onClick={() => navigate("/painel/lojista/meu-plano")}
+                >
+                    Acessar meu plano
+                </button>
+            </div>
+        </div>
+        
+
         {/* RESULTADOS */}
         <div className="col-md-6 col-lg-4">
             <div className="card border-0 shadow-sm rounded-4 h-100 p-4">

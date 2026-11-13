@@ -15,7 +15,7 @@ import EstatisticasAdmin from './pages/painel/EstatisticasAdmin';
 import ModeracaoAvaliacoes from './pages/painel/ModeracaoAvaliacoes';
 
 import EditarPaginaPremium from './pages/painel/EditarPaginaPremium';
-
+import MeuPlano from './pages/painel/MeuPlano';
 import LoginLojista from './pages/painel/LoginLojista';
 import DashboardLojista from './pages/painel/DashboardLojista';
 import DashboardAdmin from './pages/painel/DashboardAdmin';
@@ -49,6 +49,7 @@ function App() {
 
         <Route path="/login-lojista" element={<LoginLojista />} />
         <Route path="/painel/lojista" element={<DashboardLojista />} />
+        <Route path="/painel/lojista/meu-plano" element={<MeuPlano />}/>
 
         <Route
           path="/painel/admin"

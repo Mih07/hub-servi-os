@@ -26,9 +26,23 @@ function EditarPaginaPremium() {
     link: "",
   });
 
+  const [servicosDestaque, setServicosDestaque] = useState([
+    { nome: "", descricao: "" },
+    { nome: "", descricao: "" },
+    { nome: "", descricao: "" },
+    { nome: "", descricao: "" },
+  ]);
+
+
   const [logoFile, setLogoFile] = useState(null);
   const [foto1File, setFoto1File] = useState(null);
   const [foto2File, setFoto2File] = useState(null);
+  const [foto3File, setFoto3File] = useState(null);
+  const [foto4File, setFoto4File] = useState(null);
+  const [removerFoto1, setRemoverFoto1] = useState(false);
+  const [removerFoto2, setRemoverFoto2] = useState(false);
+  const [removerFoto3, setRemoverFoto3] = useState(false);
+  const [removerFoto4, setRemoverFoto4] = useState(false);
 
   // Recupera o telefone salvo no formato de link do WhatsApp
   const extrairTelefone = (valor) => {
@@ -97,6 +111,17 @@ function EditarPaginaPremium() {
           instagram: extrairInstagram(data.instagram),
           link: data.link || "",
         });
+
+        const servicosSalvos = Array.isArray(data.servicos_destaque)
+          ? data.servicos_destaque
+          : [];
+
+        setServicosDestaque(
+          Array.from({ length: 4 }, (_, index) => ({
+            nome: servicosSalvos[index]?.nome || "",
+            descricao: servicosSalvos[index]?.descricao || "",
+          }))
+        );
 
       } catch (error) {
         console.error("Erro ao carregar página:", error);
@@ -192,7 +217,19 @@ function EditarPaginaPremium() {
         whatsapp: gerarLinkWhatsApp(formData.whatsapp),
         instagram: gerarLinkInstagram(formData.instagram),
         link: formData.link.trim() || null,
+        servicos_destaque: servicosDestaque
+        .filter((servico) => servico.nome.trim() !== "")
+        .map((servico) => ({
+          nome: servico.nome.trim(),
+          descricao: servico.descricao.trim(),
+        })),
       };
+
+      // Remover fotos selecionadas
+      if (removerFoto1) atualizacoes.imagem2 = null;
+      if (removerFoto2) atualizacoes.imagem3 = null;
+      if (removerFoto3) atualizacoes.imagem4 = null;
+      if (removerFoto4) atualizacoes.imagem5 = null;
 
       if (logoFile) {
         atualizacoes.imagem = await enviarImagem(logoFile);
@@ -204,6 +241,14 @@ function EditarPaginaPremium() {
 
       if (foto2File) {
         atualizacoes.imagem3 = await enviarImagem(foto2File);
+      }
+
+      if (foto3File) {
+        atualizacoes.imagem4 = await enviarImagem(foto3File);
+      }
+
+      if (foto4File) {
+        atualizacoes.imagem5 = await enviarImagem(foto4File);
       }
 
       console.log("ID do lojista:", lojista.id);
@@ -234,6 +279,12 @@ function EditarPaginaPremium() {
       setLogoFile(null);
       setFoto1File(null);
       setFoto2File(null);
+      setFoto3File(null);
+      setFoto4File(null);
+      setRemoverFoto1(false);
+      setRemoverFoto2(false);
+      setRemoverFoto3(false);
+      setRemoverFoto4(false);
 
       setMensagem("Sua página Premium foi atualizada com sucesso!");
 
@@ -439,6 +490,80 @@ function EditarPaginaPremium() {
         </div>
 
         <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 className="fw-bold mb-2" style={{ color: "#d63384" }}>
+            <i className="bi bi-briefcase me-2"></i>
+            Serviços em destaque
+          </h5>
+
+          <p className="text-secondary small">
+            Apresente até 4 serviços oferecidos pelo seu negócio.
+            Preencha apenas os que deseja exibir na sua página.
+          </p>
+
+          {servicosDestaque.map((servico, index) => (
+            <div
+              key={index}
+              className="rounded-4 p-3 mb-3"
+              style={{ backgroundColor: "#fff5f9" }}
+            >
+              <h6 className="fw-bold mb-3" style={{ color: "#5d4037" }}>
+                Serviço {index + 1}
+              </h6>
+
+              <div className="mb-3">
+                <label className="form-label fw-semibold">
+                  Nome do serviço
+                </label>
+
+                <input
+                  type="text"
+                  className="form-control rounded-3"
+                  placeholder="Ex.: Criação de sites"
+                  maxLength={60}
+                  value={servico.nome}
+                  onChange={(e) =>
+                    setServicosDestaque((prev) =>
+                      prev.map((item, i) =>
+                        i === index
+                          ? { ...item, nome: e.target.value }
+                          : item
+                      )
+                    )
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="form-label fw-semibold">
+                  Descrição
+                </label>
+
+                <textarea
+                  className="form-control rounded-3"
+                  rows="2"
+                  placeholder="Descreva brevemente este serviço..."
+                  maxLength={150}
+                  value={servico.descricao}
+                  onChange={(e) =>
+                    setServicosDestaque((prev) =>
+                      prev.map((item, i) =>
+                        i === index
+                          ? { ...item, descricao: e.target.value }
+                          : item
+                      )
+                    )
+                  }
+                />
+
+                <small className="text-secondary">
+                  {servico.descricao.length}/150 caracteres
+                </small>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">
           <h5 className="fw-bold mb-3" style={{ color: "#d63384" }}>
             <i className="bi bi-camera me-2"></i>
             Identidade visual e fotos
@@ -469,13 +594,30 @@ function EditarPaginaPremium() {
           <div className="mb-3">
             <label className="form-label fw-semibold">Foto da galeria 1</label>
             {lojista.imagem2 && (
-              <img
-                src={lojista.imagem2}
-                alt="Foto atual 1"
-                className="d-block rounded-3 mb-2"
-                style={{ width: "150px", height: "100px", objectFit: "cover" }}
-              />
+              <div className="mb-2">
+                <img
+                  src={lojista.imagem2}
+                  alt="Foto atual 1"
+                  className="d-block rounded-3 mb-2"
+                  style={{ width: "150px", height: "100px", objectFit: "cover" }}
+                />
+
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => setRemoverFoto1(!removerFoto1)}
+                >
+                  {removerFoto1 ? "Cancelar remoção" : "Remover foto"}
+                </button>
+
+                {removerFoto1 && (
+                  <small className="d-block text-danger mt-1">
+                    A foto será removida ao salvar.
+                  </small>
+                )}
+              </div>
             )}
+            
             <input
               type="file"
               accept="image/*"
@@ -487,13 +629,30 @@ function EditarPaginaPremium() {
           <div>
             <label className="form-label fw-semibold">Foto da galeria 2</label>
             {lojista.imagem3 && (
-              <img
-                src={lojista.imagem3}
-                alt="Foto atual 2"
-                className="d-block rounded-3 mb-2"
-                style={{ width: "150px", height: "100px", objectFit: "cover" }}
-              />
+              <div className="mb-2">
+                <img
+                  src={lojista.imagem3}
+                  alt="Foto atual 2"
+                  className="d-block rounded-3 mb-2"
+                  style={{ width: "150px", height: "100px", objectFit: "cover" }}
+                />
+
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => setRemoverFoto2(!removerFoto2)}
+                >
+                  {removerFoto2 ? "Cancelar remoção" : "Remover foto"}
+                </button>
+
+                {removerFoto2 && (
+                  <small className="d-block text-danger mt-1">
+                    A foto será removida ao salvar.
+                  </small>
+                )}
+              </div>
             )}
+            
             <input
               type="file"
               accept="image/*"
@@ -501,6 +660,83 @@ function EditarPaginaPremium() {
               onChange={(e) => setFoto2File(e.target.files?.[0] || null)}
             />
           </div>
+
+                    <div className="mb-3">
+            <label className="form-label fw-semibold">
+              Foto da galeria 3
+            </label>
+
+            {lojista.imagem4 && (
+              <div className="mb-2">
+                <img
+                  src={lojista.imagem4}
+                  alt="Foto atual 3"
+                  className="d-block rounded-3 mb-2"
+                  style={{ width: "150px", height: "100px", objectFit: "cover" }}
+                />
+
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => setRemoverFoto3(!removerFoto3)}
+                >
+                  {removerFoto3 ? "Cancelar remoção" : "Remover foto"}
+                </button>
+
+                {removerFoto3 && (
+                  <small className="d-block text-danger mt-1">
+                    A foto será removida ao salvar.
+                  </small>
+                )}
+              </div>
+            )}
+
+            <input
+              type="file"
+              accept="image/*"
+              className="form-control"
+              onChange={(e) => setFoto3File(e.target.files?.[0] || null)}
+            />
+          </div>
+
+          <div>
+            <label className="form-label fw-semibold">
+              Foto da galeria 4
+            </label>
+
+            {lojista.imagem5 && (
+              <div className="mb-2">
+                <img
+                  src={lojista.imagem5}
+                  alt="Foto atual 4"
+                  className="d-block rounded-3 mb-2"
+                  style={{ width: "150px", height: "100px", objectFit: "cover" }}
+                />
+
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-danger"
+                  onClick={() => setRemoverFoto4(!removerFoto4)}
+                >
+                  {removerFoto4 ? "Cancelar remoção" : "Remover foto"}
+                </button>
+
+                {removerFoto4 && (
+                  <small className="d-block text-danger mt-1">
+                    A foto será removida ao salvar.
+                  </small>
+                )}
+              </div>
+            )}
+
+            <input
+              type="file"
+              accept="image/*"
+              className="form-control"
+              onChange={(e) => setFoto4File(e.target.files?.[0] || null)}
+            />
+          </div>
+
         </div>
 
         <div className="card border-0 shadow-sm rounded-4 p-4 mb-4">

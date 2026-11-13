@@ -443,6 +443,41 @@ const configuracao =
         : configuracao.descricao}
     </p>
 
+    {/* SERVIÇOS EM DESTAQUE */}
+    {Array.isArray(loja.servicos_destaque) &&
+      loja.servicos_destaque.length > 0 && (
+        <div className="mt-4 mb-4">
+          <h5 className="fw-bold mb-3" style={{ color: "#5d4037" }}>
+            <i className="bi bi-stars me-2" style={{ color: "#d63384" }}></i>
+            Serviços em destaque
+          </h5>
+
+          <div className="row g-3">
+            {loja.servicos_destaque.map((servico, index) => (
+              <div className="col-12 col-md-6" key={index}>
+                <div
+                  className="h-100 rounded-4 p-3"
+                  style={{
+                    backgroundColor: "#fff5f9",
+                    border: "1px solid #f0d6e3",
+                  }}
+                >
+                  <h6 className="fw-bold mb-2" style={{ color: "#d63384" }}>
+                    {servico.nome}
+                  </h6>
+
+                  {servico.descricao && (
+                    <p className="text-secondary small mb-0">
+                      {servico.descricao}
+                    </p>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+    )}
+
     {/* VITRINE DEMONSTRATIVA DA CAMOMILA */}
     {loja.slug === "camomila-sabonetes-artesanais" ? (
 
@@ -634,19 +669,26 @@ const configuracao =
 
     <div className="row g-3">
 
-      {[loja.imagem2, loja.imagem3]
+      {[loja.imagem2, loja.imagem3, loja.imagem4, loja.imagem5]
         .filter(Boolean)
         .map((foto, index) => (
           <div className="col-12 col-sm-6 col-md-4" key={index}>
 
             <div
-              className="overflow-hidden rounded-4 shadow-sm"
-              style={{ height: "220px" }}
+              className="rounded-4"
+              style={{
+                height: "220px",
+                padding: "5px",
+                backgroundColor: "#fff5f9",
+                border: "1px solid #f0d6e3",
+                boxShadow: "0 2px 8px rgba(93,64,55,0.08)",
+                overflow: "hidden",
+              }}
             >
               <img
                 src={foto}
                 alt={`Foto ${index + 1} de ${loja.nome}`}
-                className="w-100 h-100"
+                className="w-100 h-100 rounded-3"
                 style={{
                   objectFit: "cover",
                   transition: "transform 0.3s ease",
@@ -659,7 +701,7 @@ const configuracao =
 
     </div>
 
-    {!loja.imagem2 && !loja.imagem3 && (
+    {!loja.imagem2 && !loja.imagem3 && !loja.imagem4 && !loja.imagem5 && (
       <div
         className="text-center py-5 rounded-4"
         style={{ backgroundColor: "#fff5f9" }}
@@ -815,6 +857,7 @@ const configuracao =
             placeholder="Digite seu nome"
             value={nomeCliente}
             onChange={(e) => setNomeCliente(e.target.value)}
+            minLength={2}
             maxLength={80}
             required
           />
@@ -868,6 +911,7 @@ const configuracao =
             value={comentario}
             onChange={(e) => setComentario(e.target.value)}
             maxLength={1000}
+            minLength={10}
             required
           ></textarea>
 

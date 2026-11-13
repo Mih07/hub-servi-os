@@ -935,6 +935,7 @@ const totalPendentes = empresas.filter(
                 <table className="table table-hover align-middle">
                   <thead className="table-light">
                     <tr>
+                      <th>Cadastro do contrato</th>
                       <th>Empresa</th>
                       <th>Plano</th>
                       <th>Modalidade</th>
@@ -971,7 +972,11 @@ const totalPendentes = empresas.filter(
                           </td>
 
                           <td>
-                            {formatarMoeda(item.valor_ciclo)}
+                            {item.created_at
+                              ? new Date(
+                                  `${String(item.created_at).slice(0, 10)}T12:00:00`
+                                ).toLocaleDateString("pt-BR")
+                              : "—"}
                           </td>
 
                           <td>

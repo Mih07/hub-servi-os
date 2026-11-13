@@ -6,13 +6,14 @@ function EmpresasAdmin() {
   const [empresas, setEmpresas] = useState([]);
   const [busca, setBusca] = useState("");
   const [filtroStatus, setFiltroStatus] = useState("todos");
+  const [filtroArquivamento, setFiltroArquivamento] = useState("ativos");
   const [empresaSelecionada, setEmpresaSelecionada] = useState(null);
   const [carregando, setCarregando] = useState(true);
 
   const [editandoEmpresa, setEditandoEmpresa] = useState(false);
   const [dadosEditados, setDadosEditados] = useState({});
   const [salvandoEmpresa, setSalvandoEmpresa] = useState(false);
-  const [excluindoEmpresaId, setExcluindoEmpresaId] = useState(null);
+  const [arquivandoEmpresaId, setArquivandoEmpresaId] = useState(null);
 
   const navigate = useNavigate();
 
@@ -30,6 +31,7 @@ function EmpresasAdmin() {
           status,
           aprovado,
           destaque,
+          arquivado,
           plano,
           created_at,
           categoria,
@@ -171,51 +173,57 @@ function EmpresasAdmin() {
     }
   };
 
-  const excluirEmpresa = async (empresa) => {
-    const confirmar = window.confirm(
-      `Tem certeza de que deseja excluir "${empresa.nome}"?\n\n` +
-      "Essa ação remove o cadastro da tabela de empresas do Hub e não pode ser desfeita. " +
-      "A conta de autenticação do lojista não será excluída."
+  const arquivarEmpresa = async (empresa) => {
+  const novoEstado = !empresa.arquivado;
+
+  const confirmar = window.confirm(
+    novoEstado
+      ? `Deseja arquivar "${empresa.nome}"?\n\nO cadastro ficará oculto do público, mas todos os dados e o histórico financeiro serão preservados.`
+      : `Deseja restaurar "${empresa.nome}"?\n\nO cadastro voltará a ficar disponível conforme seu status de aprovação.`
+  );
+
+  if (!confirmar) return;
+
+  setArquivandoEmpresaId(empresa.id);
+
+  try {
+    const { data, error } = await supabase
+      .from("servicos")
+      .update({ arquivado: novoEstado })
+      .eq("id", empresa.id)
+      .select("id, arquivado")
+      .single();
+
+    if (error) throw error;
+
+    setEmpresas((prev) =>
+      prev.map((item) =>
+        item.id === empresa.id
+          ? { ...item, arquivado: data.arquivado }
+          : item
+      )
     );
 
-    if (!confirmar) return;
-
-    setExcluindoEmpresaId(empresa.id);
-
-    try {
-      const { error } = await supabase
-        .from("servicos")
-        .delete()
-        .eq("id", empresa.id);
-
-      if (error) throw error;
-
-      setEmpresas((prev) =>
-        prev.filter((item) => item.id !== empresa.id)
-      );
-
-      if (empresaSelecionada?.id === empresa.id) {
-        setEmpresaSelecionada(null);
-        setEditandoEmpresa(false);
-        setDadosEditados({});
-      }
-
-      alert("Cadastro da empresa excluído com sucesso!");
-    } catch (error) {
-      console.error("Erro ao excluir empresa:", error);
-
-      if (error.code === "42501" || error.message?.toLowerCase().includes("permission")) {
-        alert(
-          "O Supabase bloqueou a exclusão por falta de permissão (RLS). " +
-          "Será necessário configurar uma política DELETE segura para o administrador."
-        );
-      } else {
-        alert(error.message || "Não foi possível excluir a empresa.");
-      }
-    } finally {
-      setExcluindoEmpresaId(null);
+    if (empresaSelecionada?.id === empresa.id) {
+      setEmpresaSelecionada((prev) => ({
+        ...prev,
+        arquivado: data.arquivado,
+      }));
     }
-  };
+
+    alert(
+      novoEstado
+        ? "Cadastro arquivado com sucesso!"
+        : "Cadastro restaurado com sucesso!"
+    );
+
+  } catch (error) {
+    console.error("Erro ao arquivar/restaurar cadastro:", error);
+    alert(error.message || "Não foi possível atualizar o cadastro.");
+  } finally {
+    setArquivandoEmpresaId(null);
+  }
+};
 
   const fecharModal = () => {
     if (salvandoEmpresa) return;
@@ -226,18 +234,29 @@ function EmpresasAdmin() {
   };
 
   const empresasFiltradas = empresas.filter((empresa) => {
-    const nomeEmpresa = (empresa.nome || "").toLowerCase();
-    const termoBusca = busca.toLowerCase();
+  const nomeEmpresa = (empresa.nome || "").toLowerCase();
+  const termoBusca = busca.toLowerCase();
 
-    const correspondeBusca = nomeEmpresa.includes(termoBusca);
+  const correspondeBusca = nomeEmpresa.includes(termoBusca);
 
-    const correspondeStatus =
-      filtroStatus === "todos" ||
-      empresa.status === filtroStatus ||
-      (filtroStatus === "rejeitado" && empresa.status === "reprovado");
+  const correspondeStatus =
+    filtroStatus === "todos" ||
+    empresa.status === filtroStatus ||
+    (filtroStatus === "rejeitado" && empresa.status === "reprovado");
 
-    return correspondeBusca && correspondeStatus;
-  });
+  const correspondeArquivamento =
+    filtroArquivamento === "todos"
+      ? true
+      : filtroArquivamento === "arquivados"
+      ? empresa.arquivado === true
+      : empresa.arquivado !== true;
+
+  return (
+    correspondeBusca &&
+    correspondeStatus &&
+    correspondeArquivamento
+  );
+});
 
   const campoEditavel = (label, campo, tipo = "text") => (
     <div className="col-md-6" key={campo}>
@@ -274,7 +293,8 @@ function EmpresasAdmin() {
 
         <div className="card border-0 shadow-sm rounded-4 p-4">
           <div className="row g-3 mb-4">
-            <div className="col-md-8">
+
+            <div className="col-md-6">
               <input
                 type="text"
                 className="form-control rounded-3"
@@ -284,7 +304,7 @@ function EmpresasAdmin() {
               />
             </div>
 
-            <div className="col-md-4">
+            <div className="col-md-3">
               <select
                 className="form-select rounded-3"
                 value={filtroStatus}
@@ -296,6 +316,19 @@ function EmpresasAdmin() {
                 <option value="rejeitado">Rejeitados / Reprovados</option>
               </select>
             </div>
+
+            <div className="col-md-3">
+              <select
+                className="form-select rounded-3"
+                value={filtroArquivamento}
+                onChange={(e) => setFiltroArquivamento(e.target.value)}
+              >
+                <option value="ativos">Cadastros ativos</option>
+                <option value="arquivados">Cadastros arquivados</option>
+                <option value="todos">Todos os cadastros</option>
+              </select>
+            </div>
+
           </div>
 
           <div className="mb-3">
@@ -328,17 +361,25 @@ function EmpresasAdmin() {
                       <td className="fw-semibold">{empresa.nome}</td>
 
                       <td>
-                        <span
-                          className={`badge ${
-                            empresa.status === "aprovado"
-                              ? "bg-success"
-                              : empresa.status === "pendente"
-                              ? "bg-warning text-dark"
-                              : "bg-danger"
-                          }`}
-                        >
-                          {empresa.status || "-"}
-                        </span>
+                        <div className="d-flex flex-column align-items-start gap-1">
+                          <span
+                            className={`badge ${
+                              empresa.status === "aprovado"
+                                ? "bg-success"
+                                : empresa.status === "pendente"
+                                ? "bg-warning text-dark"
+                                : "bg-danger"
+                            }`}
+                          >
+                            {empresa.status || "-"}
+                          </span>
+
+                          {empresa.arquivado && (
+                            <span className="badge bg-secondary">
+                              Arquivado
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       <td>
@@ -394,13 +435,19 @@ function EmpresasAdmin() {
 
                           <button
                             type="button"
-                            className="btn btn-sm btn-outline-danger rounded-3"
-                            onClick={() => excluirEmpresa(empresa)}
-                            disabled={excluindoEmpresaId === empresa.id}
+                            className={`btn btn-sm rounded-3 ${
+                              empresa.arquivado
+                                ? "btn-outline-success"
+                                : "btn-outline-danger"
+                            }`}
+                            onClick={() => arquivarEmpresa(empresa)}
+                            disabled={arquivandoEmpresaId === empresa.id}
                           >
-                            {excluindoEmpresaId === empresa.id
-                              ? "Excluindo..."
-                              : "Excluir"}
+                            {arquivandoEmpresaId === empresa.id
+                              ? "Salvando..."
+                              : empresa.arquivado
+                              ? "Restaurar"
+                              : "Arquivar"}
                           </button>
                         </div>
                       </td>

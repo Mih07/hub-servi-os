@@ -4,8 +4,15 @@ import { useNavigate } from "react-router-dom";
 
 function DashboardAdmin() {
   const [totalEmpresas, setTotalEmpresas] = useState(0);
+  const [totalNaoArquivadas, setTotalNaoArquivadas] = useState(0);
+  const [totalArquivadas, setTotalArquivadas] = useState(0);
   const [totalPendentes, setTotalPendentes] = useState(0);
   const [totalAvaliacoesPendentes, setTotalAvaliacoesPendentes] = useState(0);
+  const [totalDestaques, setTotalDestaques] = useState(0);
+
+  const [totalPlanosPagos, setTotalPlanosPagos] = useState(0);
+  const [totalBonificados, setTotalBonificados] = useState(0);
+  const [totalDemonstrativos, setTotalDemonstrativos] = useState(0);
   const navigate = useNavigate();
 
   const sair = async () => {
@@ -15,54 +22,97 @@ function DashboardAdmin() {
 
 
   useEffect(() => {
-    const buscarTotalEmpresas = async () => {
-      const {count, error} = await supabase
+  const buscarIndicadores = async () => {
+    const [
+      resultadoEmpresas,
+      resultadoAssinaturas,
+      resultadoAvaliacoes
+    ] = await Promise.all([
+
+      supabase
         .from("servicos")
-        .select("*", { count: "exact", head: true });
-      
-      if (error) {
-        console.error("Erro ao buscar total de empresas:", error);
-        return;
-      }
+        .select("id, status, destaque, arquivado"),
 
-      setTotalEmpresas(count || 0);
-    };
+      supabase
+        .from("assinaturas")
+        .select("id, tipo_contrato, status"),
 
-    const buscarTotalPendentes = async () => {
-      const { count, error } = await supabase
-        .from("servicos")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pendente");
-
-      if (error) {
-        console.error("Erro ao buscar empresas pendentes:", error);
-        return;
-      }
-
-      setTotalPendentes(count || 0);
-    };
-
-    // COLE A FUNÇÃO AQUI
-    const buscarTotalAvaliacoesPendentes = async () => {
-      const { count, error } = await supabase
+      supabase
         .from("avaliacoes")
-        .select("*", { count: "exact", head: true })
-        .eq("aprovado", false);
+        .select("id", { count: "exact", head: true })
+        .eq("aprovado", false)
+    ]);
 
-      if (error) {
-        console.error("Erro ao buscar avaliações pendentes:", error);
-        return;
-      }
+    const erros = [
+      resultadoEmpresas.error,
+      resultadoAssinaturas.error,
+      resultadoAvaliacoes.error
+    ].filter(Boolean);
 
-      setTotalAvaliacoesPendentes(count || 0);
-    };
+    if (erros.length > 0) {
+      console.error("Erro ao buscar indicadores:", erros);
+    }
 
-    // CHAMADAS
-    buscarTotalEmpresas();
-    buscarTotalPendentes();
-    buscarTotalAvaliacoesPendentes();
+    // CADASTROS
+    const empresas = resultadoEmpresas.data || [];
 
-    }, []);
+    setTotalEmpresas(empresas.length);
+
+    setTotalArquivadas(
+      empresas.filter((empresa) => empresa.arquivado === true).length
+    );
+
+    setTotalNaoArquivadas(
+      empresas.filter((empresa) => empresa.arquivado !== true).length
+    );
+
+    setTotalPendentes(
+      empresas.filter(
+        (empresa) =>
+          empresa.arquivado !== true &&
+          empresa.status === "pendente"
+      ).length
+    );
+
+    setTotalDestaques(
+      empresas.filter(
+        (empresa) =>
+          empresa.arquivado !== true &&
+          empresa.destaque === true
+      ).length
+    );
+
+    // CONTRATOS ATIVOS
+    const contratosAtivos = (resultadoAssinaturas.data || []).filter(
+      (item) => item.status === "active" || item.status === "ativa"
+    );
+
+    setTotalPlanosPagos(
+      contratosAtivos.filter(
+        (item) => item.tipo_contrato === "pago"
+      ).length
+    );
+
+    setTotalBonificados(
+      contratosAtivos.filter(
+        (item) => item.tipo_contrato === "bonificado"
+      ).length
+    );
+
+    setTotalDemonstrativos(
+      contratosAtivos.filter(
+        (item) => item.tipo_contrato === "demonstrativo"
+      ).length
+    );
+
+    // AVALIAÇÕES PENDENTES
+    setTotalAvaliacoesPendentes(
+      resultadoAvaliacoes.count || 0
+    );
+  };
+
+  buscarIndicadores();
+}, []);
 
 
 
@@ -132,80 +182,83 @@ function DashboardAdmin() {
           Visão geral
         </h4>
 
-        <div className="row g-4">
+        
+<div className="row g-4">
 
-          {/* EMPRESAS */}
-          <div className="col-md-6 col-lg-3">
-            <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
-              <div className="fs-1 mb-3">
-                🏪
-              </div>
+  {/* TOTAL DE EMPRESAS */}
+  <div className="col-md-6 col-lg-3">
+    <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
+      <div className="fs-1 mb-3">🏪</div>
+      <p className="text-secondary mb-1">Empresas cadastradas</p>
+      <h2 className="fw-bold mb-0">{totalEmpresas}</h2>
+    </div>
+  </div>
 
-              <p className="text-secondary mb-1">
-                Empresas cadastradas
-              </p>
+  {/* NÃO ARQUIVADAS */}
+  <div className="col-md-6 col-lg-3">
+    <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
+      <div className="fs-1 mb-3">✅</div>
+      <p className="text-secondary mb-1">Não arquivadas</p>
+      <h2 className="fw-bold mb-0">{totalNaoArquivadas}</h2>
+    </div>
+  </div>
 
-              <h2 className="fw-bold mb-0">
-                {totalEmpresas}
-              </h2>
-            </div>
-          </div>
+  {/* ARQUIVADAS */}
+  <div className="col-md-6 col-lg-3">
+    <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
+      <div className="fs-1 mb-3">📦</div>
+      <p className="text-secondary mb-1">Arquivadas</p>
+      <h2 className="fw-bold mb-0">{totalArquivadas}</h2>
+    </div>
+  </div>
 
+  {/* PENDENTES */}
+  <div className="col-md-6 col-lg-3">
+    <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
+      <div className="fs-1 mb-3">⏳</div>
+      <p className="text-secondary mb-1">Pendentes</p>
+      <h2 className="fw-bold mb-0">{totalPendentes}</h2>
+    </div>
+  </div>
 
-          {/* PENDENTES */}
-          <div className="col-md-6 col-lg-3">
-            <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
-              <div className="fs-1 mb-3">
-                ⏳
-              </div>
+  {/* DESTAQUES */}
+  <div className="col-md-6 col-lg-3">
+    <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
+      <div className="fs-1 mb-3">⭐</div>
+      <p className="text-secondary mb-1">Destaques</p>
+      <h2 className="fw-bold mb-0">{totalDestaques}</h2>
+    </div>
+  </div>
 
-              <p className="text-secondary mb-1">
-                Pendentes
-              </p>
+  {/* CONTRATOS PAGOS */}
+  <div className="col-md-6 col-lg-3">
+    <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
+      <div className="fs-1 mb-3">💎</div>
+      <p className="text-secondary mb-1">Contratos pagos</p>
+      <h2 className="fw-bold mb-0">{totalPlanosPagos}</h2>
+    </div>
+  </div>
 
-              <h2 className="fw-bold mb-0">
-                {totalPendentes}
-              </h2>
-            </div>
-          </div>
+  {/* BONIFICADOS */}
+  <div className="col-md-6 col-lg-3">
+    <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
+      <div className="fs-1 mb-3">🎁</div>
+      <p className="text-secondary mb-1">Bonificados</p>
+      <h2 className="fw-bold mb-0">{totalBonificados}</h2>
+    </div>
+  </div>
 
+  {/* DEMONSTRATIVOS */}
+  <div className="col-md-6 col-lg-3">
+    <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
+      <div className="fs-1 mb-3">📋</div>
+      <p className="text-secondary mb-1">Demonstrativos</p>
+      <h2 className="fw-bold mb-0">{totalDemonstrativos}</h2>
+    </div>
+  </div>
 
-          {/* DESTAQUES */}
-          <div className="col-md-6 col-lg-3">
-            <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
-              <div className="fs-1 mb-3">
-                ⭐
-              </div>
+</div>
 
-              <p className="text-secondary mb-1">
-                Destaques
-              </p>
-
-              <h2 className="fw-bold mb-0">
-                4
-              </h2>
-            </div>
-          </div>
-
-
-          {/* PLANOS */}
-          <div className="col-md-6 col-lg-3">
-            <div className="card border-0 shadow-sm rounded-4 h-100 p-4">
-              <div className="fs-1 mb-3">
-                💎
-              </div>
-
-              <p className="text-secondary mb-1">
-                Planos pagos
-              </p>
-
-              <h2 className="fw-bold mb-0">
-                8
-              </h2>
-            </div>
-          </div>
-
-        </div>
       </div>
 
 
